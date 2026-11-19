@@ -768,7 +768,7 @@ function BitryPublicSite({
               onClick={onEnterApp}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#5D38F6] hover:bg-[#4D29E3] text-white text-sm font-bold shadow-lg shadow-[#5D38F6]/25 transition active:scale-95"
             >
-              <span>Sign In</span>
+              <span>Open App</span>
               <ArrowRightIcon className="w-4 h-4" />
             </button>
           </div>
@@ -815,7 +815,7 @@ function BitryPublicSite({
                 }}
                 className="w-full py-3 rounded-full bg-[#5D38F6] text-white text-sm font-bold text-center inline-flex items-center justify-center gap-2"
               >
-                <span>Sign In</span>
+                <span>Open App</span>
                 <ArrowRightIcon className="w-4 h-4" />
               </button>
             </div>
@@ -1039,7 +1039,7 @@ function HomePageContent({ onEnterApp, onNavigatePage }) {
                   onClick={onEnterApp}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#5D38F6] hover:bg-[#4D29E3] text-white text-base font-bold shadow-xl shadow-[#5D38F6]/30 transition active:scale-95"
                 >
-                  <span>Sign In</span>
+                  <span>Open App</span>
                   <ArrowRightIcon className="w-5 h-5" />
                 </button>
               </div>
