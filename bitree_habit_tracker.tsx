@@ -1,33 +1,259 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import {
-  Settings,
-  Calendar as CalendarIcon,
-  Plus,
-  MoreVertical,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  ArrowLeft,
-  Check,
-  Trash2,
-  Edit3,
-  History,
-  RotateCcw,
-  Award,
-  Flame,
-  CheckCircle2,
-  Sparkles,
-  SlidersHorizontal
-} from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // ============================================================================
-// CONSTANTS & THEME PALETTES
+// NATIVE INLINE SVG ICONS (Prevents cross-bundle React $$typeof mismatches)
 // ============================================================================
 
-// Reference "Today" anchor matching the user's screenshots: Monday, Nov 9, 2026
+function IconBase({ children, className = 'w-5 h-5', viewBox = '0 0 24 24', fill = 'none' }) {
+  return (
+    <svg
+      className={className}
+      viewBox={viewBox}
+      fill={fill}
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+const SettingsIcon = ({ className }) => (
+  <IconBase className={className}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </IconBase>
+);
+
+const CalendarIcon = ({ className }) => (
+  <IconBase className={className}>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </IconBase>
+);
+
+const PlusIcon = ({ className }) => (
+  <IconBase className={className}>
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </IconBase>
+);
+
+const MoreVerticalIcon = ({ className }) => (
+  <IconBase className={className}>
+    <circle cx="12" cy="12" r="1" />
+    <circle cx="12" cy="5" r="1" />
+    <circle cx="12" cy="19" r="1" />
+  </IconBase>
+);
+
+const XIcon = ({ className }) => (
+  <IconBase className={className}>
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </IconBase>
+);
+
+const ChevronLeftIcon = ({ className }) => (
+  <IconBase className={className}>
+    <polyline points="15 18 9 12 15 6" />
+  </IconBase>
+);
+
+const ChevronRightIcon = ({ className }) => (
+  <IconBase className={className}>
+    <polyline points="9 18 15 12 9 6" />
+  </IconBase>
+);
+
+const ChevronDownIcon = ({ className }) => (
+  <IconBase className={className}>
+    <polyline points="6 9 12 15 18 9" />
+  </IconBase>
+);
+
+const ChevronUpIcon = ({ className }) => (
+  <IconBase className={className}>
+    <polyline points="18 15 12 9 6 15" />
+  </IconBase>
+);
+
+const ArrowLeftIcon = ({ className }) => (
+  <IconBase className={className}>
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </IconBase>
+);
+
+const ArrowRightIcon = ({ className }) => (
+  <IconBase className={className}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </IconBase>
+);
+
+const CheckIcon = ({ className }) => (
+  <IconBase className={className}>
+    <polyline points="20 6 9 17 4 12" />
+  </IconBase>
+);
+
+const Trash2Icon = ({ className }) => (
+  <IconBase className={className}>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+    <line x1="10" y1="11" x2="10" y2="17" />
+    <line x1="14" y1="11" x2="14" y2="17" />
+  </IconBase>
+);
+
+const Edit3Icon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+  </IconBase>
+);
+
+const HistoryIcon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M3 3v5h5" />
+    <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8" />
+    <polyline points="12 7 12 12 15 15" />
+  </IconBase>
+);
+
+const RotateCcwIcon = ({ className }) => (
+  <IconBase className={className}>
+    <polyline points="1 4 1 10 7 10" />
+    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+  </IconBase>
+);
+
+const FlameIcon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </IconBase>
+);
+
+const CheckCircle2Icon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+    <path d="m9 12 2 2 4-4" />
+  </IconBase>
+);
+
+const SparklesIcon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+  </IconBase>
+);
+
+const ShieldIcon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </IconBase>
+);
+
+const LockIcon = ({ className }) => (
+  <IconBase className={className}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </IconBase>
+);
+
+const MailIcon = ({ className }) => (
+  <IconBase className={className}>
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </IconBase>
+);
+
+const MapPinIcon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </IconBase>
+);
+
+const SendIcon = ({ className }) => (
+  <IconBase className={className}>
+    <line x1="22" y1="2" x2="11" y2="13" />
+    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+  </IconBase>
+);
+
+const BarChart3Icon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="M3 3v18h18" />
+    <path d="M18 17V9" />
+    <path d="M13 17V5" />
+    <path d="M8 17v-3" />
+  </IconBase>
+);
+
+const MenuIcon = ({ className }) => (
+  <IconBase className={className}>
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </IconBase>
+);
+
+const HomeIcon = ({ className }) => (
+  <IconBase className={className}>
+    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </IconBase>
+);
+
+// ============================================================================
+// CONSTANTS, PUBLISHER INFO & THEME PALETTES
+// ============================================================================
+
+const PUBLISHER_INFO = {
+  appName: 'Bitry',
+  companyName: 'Cozy Automations LLC',
+  address: '1209 Mountain Road Pl NE, Albuquerque, NM 87110, USA',
+  supportEmail: 'stanley@cozyautomation.com',
+  website: 'https://cozyautomation.com',
+  lastUpdated: 'November 19, 2026'
+};
+
+// Reference "Today" anchor matching the Bitry app calendar & stats
 const INITIAL_TODAY_STR = '2026-11-09';
+
+// Curated Unsplash photography with graceful gradient/emoji fallbacks
+const LANDING_IMAGES = {
+  hero: {
+    url: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=80',
+    alt: 'Morning journaling and wellness planning desk routine',
+    fallbackEmoji: '🌱',
+    fallbackLabel: 'Daily Habit & Streak Planner'
+  },
+  movement: {
+    url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80',
+    alt: 'Movement and daily fitness consistency',
+    fallbackEmoji: '🏃',
+    fallbackLabel: 'Movement & Fitness'
+  },
+  mindful: {
+    url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=900&q=80',
+    alt: 'Mindful focus, stretching, and quiet prayer routine',
+    fallbackEmoji: '🧎',
+    fallbackLabel: 'Mindful Focus & Prayer'
+  },
+  journaling: {
+    url: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=900&q=80',
+    alt: 'Daily journaling, reading, and structured reflection',
+    fallbackEmoji: '✍️',
+    fallbackLabel: 'Daily Journaling & Planning'
+  }
+};
 
 const THEME_PALETTES = {
   amber: {
@@ -77,7 +303,6 @@ const THEME_PALETTES = {
   }
 };
 
-// Preset Categories matching Screenshot 4
 const PRESET_CATEGORIES = [
   {
     id: 'sport',
@@ -124,8 +349,31 @@ const EMOJI_OPTIONS = [
   '🎨', '🎸', '🌱', '🧹', '🍵', '🧠', '☀️', '🌙'
 ];
 
+const FAQ_ITEMS = [
+  {
+    question: 'Is Bitry completely free to use?',
+    answer:
+      'Yes. You can jump right into Bitry, track unlimited daily habits, inspect monthly calendar histories, and analyze weekly completion statistics at zero cost and with no third-party advertisements.'
+  },
+  {
+    question: 'Where is my habit data stored, and is it private?',
+    answer:
+      'Bitry uses offline-first local storage so your habit logs and streaks stay directly on your browser/device. Cozy Automations LLC does not sell your personal routine data or run behavioral ad trackers.'
+  },
+  {
+    question: 'How does streak and monthly calendar tracking work?',
+    answer:
+      'Every time you check off a habit on your daily list, Bitry updates your current streak, best streak, and 6x7 monthly calendar view—complete with a circular Goal Met ring gauge and flexible 1x to 7x weekly targets.'
+  },
+  {
+    question: 'Can I use Bitry on both mobile phones and desktop web browsers?',
+    answer:
+      'Yes. Bitry features a responsive mobile-first interface designed to feel native on phones, tablets, and desktop browsers, alongside our Android app listing on Google Play.'
+  }
+];
+
 // ============================================================================
-// DATE UTILITY FUNCTIONS
+// DATE UTILITY FUNCTIONS & INITIAL SAMPLE SEED DATA
 // ============================================================================
 
 function parseDateStr(dateStr) {
@@ -146,15 +394,6 @@ function addDays(dateStr, days) {
   return formatDateStr(dt);
 }
 
-// Get Monday of the week for any date string
-function getMondayOfWeek(dateStr) {
-  const dt = parseDateStr(dateStr);
-  const day = dt.getDay(); // 0 = Sun, 1 = Mon, ...
-  const diff = day === 0 ? -6 : 1 - day;
-  dt.setDate(dt.getDate() + diff);
-  return formatDateStr(dt);
-}
-
 const SHORT_DAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const SHORT_MONTH_NAMES = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -165,60 +404,7 @@ const FULL_MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-// ============================================================================
-// INITIAL SEED DATA (Matches Screenshots 1, 2, and 3)
-// ============================================================================
-
 function buildInitialHabits() {
-  // Build Pray history so that on Nov 9, 2026:
-  // - Current streak: 4 times (Nov 6, 7, 8, 9)
-  // - Done in month (Nov 2026): 7 days (Nov 2, 3, 4, 6, 7, 8, 9) -> 7/30 = 23% Goal Met
-  // - Missed in Nov 2026: Nov 1, Nov 5 (red borders in Screenshot 3)
-  // - Best streak: 21 times (Oct 6 through Oct 26 = 21 consecutive days)
-  // - Total done: 29 days (21 in Oct streak + Oct 28 + 7 in Nov = 29 days)
-  const prayLogs = {
-    '2026-10-06': 'done',
-    '2026-10-07': 'done',
-    '2026-10-08': 'done',
-    '2026-10-09': 'done',
-    '2026-10-10': 'done',
-    '2026-10-11': 'done',
-    '2026-10-12': 'done',
-    '2026-10-13': 'done',
-    '2026-10-14': 'done',
-    '2026-10-15': 'done',
-    '2026-10-16': 'done',
-    '2026-10-17': 'done',
-    '2026-10-18': 'done',
-    '2026-10-19': 'done',
-    '2026-10-20': 'done',
-    '2026-10-21': 'done',
-    '2026-10-22': 'done',
-    '2026-10-23': 'done',
-    '2026-10-24': 'done',
-    '2026-10-25': 'done',
-    '2026-10-26': 'done', // 21-day best streak
-    '2026-10-27': 'done', // 22nd day in Oct (Wait: let's keep Oct 6..26 = 21 streak, skip Oct 27, mark Oct 29 done -> 22 days in Oct + 7 in Nov = 29 total!)
-  };
-  delete prayLogs['2026-10-27'];
-  prayLogs['2026-10-27'] = 'done'; // Wait: if Oct 6-26 is 21, and Oct 27 is done, streak would be 22. So let's mark Oct 4 done instead!
-  delete prayLogs['2026-10-27'];
-  prayLogs['2026-10-04'] = 'done';
-  prayLogs['2026-10-27'] = 'done'; // Let's keep Oct 6-26 as 21 days, and Oct 2, 3 as 2 days -> 2 + 21 = 23? Wait: 22 in Oct + 7 in Nov = 29 total!
-  delete prayLogs['2026-10-27'];
-  // Let's also mark Oct 26, 27, 28, 29, 30 as done (green border in top row of Nov calendar) and Oct 31 as missed (red border in top row of Nov calendar)
-  // To make sure Best Streak is 21 and Total Done is 29:
-  // Suppose Oct 10 to Oct 30 is 21 consecutive days! (30 - 10 + 1 = 21 days!)
-  // Plus Oct 8 is 1 day -> 22 days in October!
-  // And Oct 31 is 'missed' (red border), Nov 1 is 'missed' (red border)!
-  // Let's verify:
-  // Oct 10..30 = 21 days streak!
-  // Oct 26, 27, 28, 29, 30 are all in Oct 10..30, so they naturally have green borders in the first row of the Nov 2026 calendar!
-  // Oct 31 has a red border!
-  // Nov 1 has a red border!
-  // Nov 2, 3, 4 have green borders!
-  // Nov 5 has a red border!
-  // Nov 6, 7, 8, 9 have green borders!
   const exactPrayLogs = {
     '2026-10-08': 'done',
     '2026-10-10': 'done',
@@ -319,10 +505,6 @@ function buildInitialHabits() {
   ];
 }
 
-// ============================================================================
-// STREAK & ANALYTICS CALCULATOR
-// ============================================================================
-
 function computeHabitStats(habit, year, monthZeroIndexed) {
   const logs = habit.logs || {};
   const doneDates = Object.keys(logs)
@@ -331,16 +513,13 @@ function computeHabitStats(habit, year, monthZeroIndexed) {
 
   const totalDone = doneDates.length;
 
-  // Done in selected month
   const monthPrefix = `${year}-${String(monthZeroIndexed + 1).padStart(2, '0')}-`;
   const daysInMonth = new Date(year, monthZeroIndexed + 1, 0).getDate();
   const doneInMonth = doneDates.filter((d) => d.startsWith(monthPrefix)).length;
 
-  // Goal met % for the month (based on days in month or monthly target)
   const monthlyGoalDays = Math.round((habit.targetPerWeek / 7) * daysInMonth) || daysInMonth;
   const goalMetPercent = Math.min(100, Math.round((doneInMonth / monthlyGoalDays) * 100));
 
-  // Best streak calculation across all doneDates
   let bestStreak = 0;
   let tempStreak = 0;
   let prevDateStr = null;
@@ -362,11 +541,11 @@ function computeHabitStats(habit, year, monthZeroIndexed) {
     prevDateStr = dStr;
   }
 
-  // Current streak (counting backward from INITIAL_TODAY_STR or latest done day if today/yesterday)
   let currentStreak = 0;
-  let cursor = logs[INITIAL_TODAY_STR] === 'done'
-    ? INITIAL_TODAY_STR
-    : addDays(INITIAL_TODAY_STR, -1);
+  let cursor =
+    logs[INITIAL_TODAY_STR] === 'done'
+      ? INITIAL_TODAY_STR
+      : addDays(INITIAL_TODAY_STR, -1);
 
   while (logs[cursor] === 'done') {
     currentStreak += 1;
@@ -383,14 +562,1222 @@ function computeHabitStats(habit, year, monthZeroIndexed) {
 }
 
 // ============================================================================
-// MAIN APPLICATION COMPONENT
+// SAFE IMAGE COMPONENT WITH GRACEFUL FALLBACK
+// ============================================================================
+
+function SafeImage({ src, alt, className, fallbackEmoji = '🌱', fallbackLabel = 'Bitry' }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div
+        className={`${className} bg-gradient-to-br from-[#5D38F6] via-[#7A49F8] to-[#A547F5] flex flex-col items-center justify-center text-white p-6 text-center`}
+      >
+        <span className="text-5xl mb-2">{fallbackEmoji}</span>
+        <span className="text-xs font-bold uppercase tracking-wider opacity-90">
+          {fallbackLabel}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      loading="lazy"
+      onError={() => setHasError(true)}
+    />
+  );
+}
+
+// ============================================================================
+// ROOT CONTROLLER: LANDING SITE <-> HABIT TRACKER APP ROUTER
 // ============================================================================
 
 export default function App() {
-  // Start with a completely blank habit state by default
+  const [isAppOpen, setIsAppOpen] = useState(() => {
+    try {
+      return localStorage.getItem('bitry_app_active') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Active public page: 'home' | 'contact' | 'privacy' | 'terms'
+  const [publicPage, setPublicPage] = useState(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash.toLowerCase() : '';
+    if (hash === '#contact') return 'contact';
+    if (hash === '#privacy') return 'privacy';
+    if (hash === '#terms') return 'terms';
+    return 'home';
+  });
+
+  const [globalToast, setGlobalToast] = useState(null);
+
+  const triggerGlobalToast = (msg) => {
+    setGlobalToast(msg);
+    setTimeout(() => {
+      setGlobalToast((prev) => (prev === msg ? null : prev));
+    }, 2600);
+  };
+
+  useEffect(() => {
+    const syncHash = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#contact') {
+        setPublicPage('contact');
+      } else if (hash === '#privacy') {
+        setPublicPage('privacy');
+      } else if (hash === '#terms') {
+        setPublicPage('terms');
+      } else if (hash === '#home' || hash === '') {
+        setPublicPage('home');
+      }
+    };
+    window.addEventListener('hashchange', syncHash);
+    return () => window.removeEventListener('hashchange', syncHash);
+  }, []);
+
+  const navigatePublicPage = (nextPage) => {
+    setPublicPage(nextPage);
+    setIsAppOpen(false);
+    try {
+      localStorage.setItem('bitry_app_active', 'false');
+      const nextHash = nextPage === 'home' ? '' : `#${nextPage}`;
+      window.history.replaceState(
+        null,
+        '',
+        nextHash || window.location.pathname + window.location.search
+      );
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      // Ignore history/storage errors in sandboxed frames
+    }
+  };
+
+  const handleEnterApp = () => {
+    setIsAppOpen(true);
+    try {
+      localStorage.setItem('bitry_app_active', 'true');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FAFBFD] text-[#141422] font-sans antialiased">
+      {isAppOpen ? (
+        <BitryTrackerApp
+          onGoHome={() => navigatePublicPage('home')}
+          onOpenLegal={(page) => navigatePublicPage(page)}
+        />
+      ) : (
+        <BitryPublicSite
+          activePage={publicPage}
+          onNavigatePage={navigatePublicPage}
+          onEnterApp={handleEnterApp}
+          onNotify={triggerGlobalToast}
+        />
+      )}
+
+      {globalToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] bg-[#141422] text-white text-xs sm:text-sm font-semibold px-5 py-3 rounded-full shadow-2xl flex items-center gap-2 border border-white/10">
+          <CheckCircle2Icon className="w-4 h-4 text-[#2ECC71] shrink-0" />
+          <span>{globalToast}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// PUBLIC WEBSITE SHELL (Navbar + Home / Contact / Privacy / Terms Pages)
+// ============================================================================
+
+function BitryPublicSite({
+  activePage,
+  onNavigatePage,
+  onEnterApp,
+  onNotify
+}) {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const navItems = [
+    { id: 'home', label: 'Home' },
+    { id: 'contact', label: 'Contact' },
+    { id: 'privacy', label: 'Privacy' },
+    { id: 'terms', label: 'Terms' }
+  ];
+
+  const handleNavClick = (pageId) => {
+    setMobileNavOpen(false);
+    onNavigatePage(pageId);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-white text-[#141422] overflow-x-hidden">
+      {/* Sticky Top Navigation Bar */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => handleNavClick('home')}
+            className="flex items-center gap-2.5 group text-left"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-[#5D38F6] text-white flex items-center justify-center text-xl shadow-md shadow-[#5D38F6]/25 group-hover:scale-105 transition">
+              🌱
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-extrabold tracking-tight text-gray-900 leading-none">
+                Bitry
+              </span>
+              <span className="text-[10px] font-semibold text-gray-400 tracking-wide mt-0.5">
+                by Cozy Automations
+              </span>
+            </div>
+          </button>
+
+          {/* Desktop Page Navigation Links */}
+          <nav className="hidden md:flex items-center gap-2 text-sm font-semibold">
+            {navItems.map((item) => {
+              const isActive = activePage === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleNavClick(item.id)}
+                  className={`px-4 py-2 rounded-full transition ${
+                    isActive
+                      ? 'bg-[#F3EEFF] text-[#5D38F6] font-bold'
+                      : 'text-gray-600 hover:text-[#5D38F6] hover:bg-gray-50'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Desktop Single Sign In CTA */}
+          <div className="hidden sm:flex items-center">
+            <button
+              type="button"
+              onClick={onEnterApp}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#5D38F6] hover:bg-[#4D29E3] text-white text-sm font-bold shadow-lg shadow-[#5D38F6]/25 transition active:scale-95"
+            >
+              <span>Sign In</span>
+              <ArrowRightIcon className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Mobile Menu Trigger */}
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen((prev) => !prev)}
+            className="sm:hidden p-2.5 rounded-xl text-gray-700 hover:bg-gray-100"
+            aria-label="Toggle Menu"
+          >
+            {mobileNavOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileNavOpen && (
+          <div className="sm:hidden bg-white border-t border-gray-100 px-5 py-5 space-y-4 shadow-xl">
+            <div className="flex flex-col space-y-1.5 text-sm font-semibold">
+              {navItems.map((item) => {
+                const isActive = activePage === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => handleNavClick(item.id)}
+                    className={`text-left px-3.5 py-2.5 rounded-xl transition ${
+                      isActive
+                        ? 'bg-[#F3EEFF] text-[#5D38F6] font-bold'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="pt-3 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  onEnterApp();
+                }}
+                className="w-full py-3 rounded-full bg-[#5D38F6] text-white text-sm font-bold text-center inline-flex items-center justify-center gap-2"
+              >
+                <span>Sign In</span>
+                <ArrowRightIcon className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Individual Page Content */}
+      <main className="flex-1 flex flex-col">
+        {activePage === 'home' && (
+          <HomePageContent
+            onEnterApp={onEnterApp}
+            onNavigatePage={onNavigatePage}
+          />
+        )}
+
+        {activePage === 'contact' && (
+          <ContactPageContent
+            onNavigatePage={onNavigatePage}
+            onNotify={onNotify}
+          />
+        )}
+
+        {activePage === 'privacy' && (
+          <PrivacyPageContent onNavigatePage={onNavigatePage} />
+        )}
+
+        {activePage === 'terms' && (
+          <TermsPageContent onNavigatePage={onNavigatePage} />
+        )}
+      </main>
+
+      {/* Shared Footer */}
+      <footer className="bg-[#141422] text-gray-300 pt-14 pb-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 pb-10 border-b border-white/10">
+            <div className="lg:col-span-5 space-y-3">
+              <button
+                type="button"
+                onClick={() => onNavigatePage('home')}
+                className="flex items-center gap-2.5"
+              >
+                <div className="w-9 h-9 rounded-xl bg-[#5D38F6] text-white flex items-center justify-center text-lg">
+                  🌱
+                </div>
+                <span className="text-xl font-extrabold text-white tracking-tight">
+                  Bitry
+                </span>
+              </button>
+              <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
+                A calm, visual daily habit tracker built to help you turn small daily
+                actions into lasting streaks.
+              </p>
+              <p className="text-xs text-gray-500 pt-1">
+                Published by {PUBLISHER_INFO.companyName} • Albuquerque, NM
+              </p>
+            </div>
+
+            <div className="lg:col-span-3 space-y-2.5">
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">
+                Pages
+              </h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => onNavigatePage('home')}
+                    className="hover:text-white transition"
+                  >
+                    Home
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => onNavigatePage('contact')}
+                    className="hover:text-white transition"
+                  >
+                    Contact Us
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => onNavigatePage('privacy')}
+                    className="hover:text-white transition"
+                  >
+                    Privacy Policy
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => onNavigatePage('terms')}
+                    className="hover:text-white transition"
+                  >
+                    Terms of Service
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div className="lg:col-span-4 space-y-2.5">
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">
+                App & Support
+              </h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>
+                  <button
+                    type="button"
+                    onClick={onEnterApp}
+                    className="hover:text-white transition"
+                  >
+                    Sign In to Bitry App
+                  </button>
+                </li>
+                <li>
+                  <a
+                    href={`mailto:${PUBLISHER_INFO.supportEmail}`}
+                    className="hover:text-white transition"
+                  >
+                    {PUBLISHER_INFO.supportEmail}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+            <p>
+              © {new Date().getFullYear()} {PUBLISHER_INFO.companyName}. All rights reserved.
+            </p>
+            <div className="flex items-center gap-5">
+              <button
+                type="button"
+                onClick={() => onNavigatePage('home')}
+                className="hover:text-gray-300 transition"
+              >
+                Home
+              </button>
+              <button
+                type="button"
+                onClick={() => onNavigatePage('contact')}
+                className="hover:text-gray-300 transition"
+              >
+                Contact
+              </button>
+              <button
+                type="button"
+                onClick={() => onNavigatePage('privacy')}
+                className="hover:text-gray-300 transition"
+              >
+                Privacy
+              </button>
+              <button
+                type="button"
+                onClick={() => onNavigatePage('terms')}
+                className="hover:text-gray-300 transition"
+              >
+                Terms
+              </button>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+// ============================================================================
+// PAGE 1: HOME LANDING PAGE CONTENT
+// ============================================================================
+
+function HomePageContent({ onEnterApp, onNavigatePage }) {
+  const [openFaqIndex, setOpenFaqIndex] = useState(0);
+
+  const [heroDemoHabits, setHeroDemoHabits] = useState([
+    { id: 'demo-walk', name: 'Morning Walk', emoji: '🚶', theme: 'green', done: true },
+    { id: 'demo-water', name: 'Drink Water', emoji: '💧', theme: 'blue', done: true },
+    { id: 'demo-read', name: 'Read 20 Mins', emoji: '📚', theme: 'purple', done: false }
+  ]);
+
+  const toggleHeroDemoHabit = (id) => {
+    setHeroDemoHabits((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, done: !item.done } : item))
+    );
+  };
+
+  const heroDoneCount = heroDemoHabits.filter((h) => h.done).length;
+  const heroProgressPct = Math.round((heroDoneCount / heroDemoHabits.length) * 100);
+
+  return (
+    <>
+      {/* Hero Section */}
+      <section className="relative pt-10 pb-20 sm:pt-16 sm:pb-28 bg-gradient-to-b from-[#F6F4FF] via-[#FAFBFD] to-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+            <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#5D38F6]/20 shadow-sm text-xs font-bold text-[#5D38F6]">
+                <SparklesIcon className="w-3.5 h-3.5" />
+                <span>Daily Habit & Streak Companion</span>
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight text-gray-900 leading-[1.1]">
+                Build lasting daily habits,{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5D38F6] to-[#A547F5]">
+                  one check-in at a time.
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Bitry gives you a calm, distraction-free workspace to track daily routines,
+                grow visual streaks, and review monthly calendar progress—starting from a
+                clean blank canvas.
+              </p>
+
+              {/* Hero Single Sign In CTA */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
+                <button
+                  type="button"
+                  onClick={onEnterApp}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#5D38F6] hover:bg-[#4D29E3] text-white text-base font-bold shadow-xl shadow-[#5D38F6]/30 transition active:scale-95"
+                >
+                  <span>Sign In</span>
+                  <ArrowRightIcon className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs font-semibold text-gray-500">
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2Icon className="w-4 h-4 text-[#2ECC71]" />
+                  No clutter
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <ShieldIcon className="w-4 h-4 text-[#5D38F6]" />
+                  Offline-first local storage
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <FlameIcon className="w-4 h-4 text-[#F5B041]" />
+                  Visual monthly streaks
+                </span>
+              </div>
+            </div>
+
+            {/* Right Column: Lifestyle Hero Photography + Interactive Mini-App */}
+            <div className="lg:col-span-6 relative mx-auto w-full max-w-lg lg:max-w-none">
+              <div className="relative rounded-[32px] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3] bg-gray-100">
+                <SafeImage
+                  src={LANDING_IMAGES.hero.url}
+                  alt={LANDING_IMAGES.hero.alt}
+                  fallbackEmoji={LANDING_IMAGES.hero.fallbackEmoji}
+                  fallbackLabel={LANDING_IMAGES.hero.fallbackLabel}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+              </div>
+
+              <div className="hidden sm:flex items-center gap-3 bg-white/95 backdrop-blur-md rounded-2xl px-4 py-3 shadow-xl border border-gray-100 absolute -top-5 -left-5">
+                <div className="w-10 h-10 rounded-xl bg-[#FFF4E5] text-[#F39C12] flex items-center justify-center">
+                  <FlameIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-extrabold text-gray-900">21-Day Best Streak</p>
+                  <p className="text-[11px] font-medium text-gray-500">Consistency builds momentum</p>
+                </div>
+              </div>
+
+              <div className="mt-5 sm:mt-0 sm:absolute sm:-bottom-8 sm:-right-4 sm:w-[325px] bg-white rounded-[26px] p-4 shadow-[0_20px_50px_rgba(20,20,45,0.18)] border border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-extrabold text-gray-900">Today’s Focus</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F6EEFF] text-[#5D38F6]">
+                      Interactive
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold text-[#5D38F6]">{heroProgressPct}%</span>
+                </div>
+
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-3">
+                  <div
+                    className="h-full bg-[#5D38F6] rounded-full transition-all duration-300"
+                    style={{ width: `${heroProgressPct}%` }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  {heroDemoHabits.map((item) => {
+                    const pal = THEME_PALETTES[item.theme] || THEME_PALETTES.purple;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => toggleHeroDemoHabit(item.id)}
+                        style={{
+                          borderColor: item.done ? pal.activeBorder : pal.border
+                        }}
+                        className="w-full rounded-2xl border-[1.6px] px-3 py-2 flex items-center justify-between bg-white hover:bg-gray-50/70 transition text-left"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            style={{
+                              backgroundColor: item.done ? pal.checkBg : 'transparent',
+                              borderColor: item.done ? pal.checkBg : '#8E8A99'
+                            }}
+                            className="w-5 h-5 rounded-full border-[1.6px] flex items-center justify-center transition"
+                          >
+                            {item.done && <CheckIcon className="w-3 h-3 text-white" />}
+                          </span>
+                          <span className="text-xs font-bold text-gray-900">{item.name}</span>
+                          <span className="text-sm">{item.emoji}</span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-gray-400">
+                          {item.done ? 'Done' : 'Tap'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visual Lifestyle Gallery */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#5D38F6]">
+              Lifestyle & Balance
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-2 tracking-tight">
+              Designed for every rhythm of your day
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 mt-3 leading-relaxed">
+              Organize physical movement, spiritual stillness, and focused reflection in
+              one unified daily checklist.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+            {[
+              {
+                img: LANDING_IMAGES.movement,
+                badge: '🏃 Sport & Energy',
+                title: 'Movement & Fitness',
+                desc: 'Track daily walks, runs, gym sessions, and swims with custom weekly frequency goals from 1x to 7x per week.'
+              },
+              {
+                img: LANDING_IMAGES.mindful,
+                badge: '🧎 Stillness & Clarity',
+                title: 'Mindful Focus & Prayer',
+                desc: 'Protect time for prayer, meditation, hydration, and early rest with color-coded streak calendars.'
+              },
+              {
+                img: LANDING_IMAGES.journaling,
+                badge: '✍️ Thought & Growth',
+                title: 'Daily Journaling & Planning',
+                desc: 'Build lasting reading, writing, and work-planning habits that compound into multi-week streaks.'
+              }
+            ].map((card) => (
+              <div
+                key={card.title}
+                className="group rounded-[28px] overflow-hidden border border-gray-100 bg-[#FAFBFD] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+              >
+                <div className="relative h-60 overflow-hidden bg-gray-100">
+                  <SafeImage
+                    src={card.img.url}
+                    alt={card.img.alt}
+                    fallbackEmoji={card.img.fallbackEmoji}
+                    fallbackLabel={card.img.fallbackLabel}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+                  <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm">
+                    {card.badge}
+                  </span>
+                  <h3 className="absolute bottom-4 left-5 right-5 text-lg font-extrabold text-white tracking-tight">
+                    {card.title}
+                  </h3>
+                </div>
+                <div className="p-6 flex-1">
+                  <p className="text-sm text-gray-600 leading-relaxed">{card.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Core Features Grid */}
+      <section className="py-16 sm:py-24 bg-[#FAFBFD] border-y border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl mx-auto text-center mb-12 sm:mb-16">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#5D38F6]">
+              Everything You Need
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-2 tracking-tight">
+              Simple on the surface. Powerful underneath.
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 mt-3">
+              Every screen in Bitry is crafted to eliminate friction so checking off your
+              habits takes less than three seconds a day.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                IconComp: CheckCircle2Icon,
+                iconColor: 'text-[#2ECC71]',
+                bg: 'bg-[#EAFAF1]',
+                title: 'One-Tap Daily Check-Ins',
+                desc: 'Tap the circular checkmark beside any habit on your 7-day week strip to complete it and watch your daily progress bar fill immediately.'
+              },
+              {
+                IconComp: HistoryIcon,
+                iconColor: 'text-[#A547F5]',
+                bg: 'bg-[#F6EEFF]',
+                title: 'Monthly Streak Calendar',
+                desc: 'Tap any habit to open its 6x7 monthly calendar grid—cycle dates between Done, Missed, and Clear while tracking your Goal Met ring gauge.'
+              },
+              {
+                IconComp: BarChart3Icon,
+                iconColor: 'text-[#3498DB]',
+                bg: 'bg-[#EBF5FB]',
+                title: 'Weekly Completion Analytics',
+                desc: 'Inspect 7-day completion bar charts and ranked per-habit completion percentages across any week of the year.'
+              },
+              {
+                IconComp: SparklesIcon,
+                iconColor: 'text-[#F39C12]',
+                bg: 'bg-[#FFF4E5]',
+                title: 'Preset & Custom Habit Library',
+                desc: 'Choose from curated Sport, Health, and Thought templates or craft custom habits with 28 expressive emojis and 5 accent border themes.'
+              },
+              {
+                IconComp: LockIcon,
+                iconColor: 'text-[#EB7A68]',
+                bg: 'bg-[#FDF3F2]',
+                title: 'Instant Local Persistence',
+                desc: 'Your habit history saves automatically to local device storage for instant offline responsiveness and privacy.'
+              },
+              {
+                IconComp: PlusIcon,
+                iconColor: 'text-[#5D38F6]',
+                bg: 'bg-[#F3EEFF]',
+                title: 'Zero-Noise Blank Canvas Start',
+                desc: 'Sign in to a calm, clutter-free screen featuring a single "+ Start Habit" button so you build your routine intentionally from scratch.'
+              }
+            ].map((feat) => {
+              const FeatureIcon = feat.IconComp;
+              return (
+                <div
+                  key={feat.title}
+                  className="bg-white rounded-[24px] p-6 border border-gray-100 shadow-sm hover:shadow-md transition"
+                >
+                  <div
+                    className={`w-11 h-11 rounded-2xl ${feat.bg} flex items-center justify-center mb-4`}
+                  >
+                    <FeatureIcon className={`w-5 h-5 ${feat.iconColor}`} />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900">{feat.title}</h3>
+                  <p className="text-sm text-gray-600 mt-2 leading-relaxed">{feat.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#5D38F6]">
+              How It Works
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-2 tracking-tight">
+              Start your first habit in under 30 seconds
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                step: '01',
+                title: 'Click Sign In',
+                desc: 'Tap Sign In in the navigation bar or hero section to open your personal Bitry workspace right away.'
+              },
+              {
+                step: '02',
+                title: 'Start Your First Habit',
+                desc: 'Tap "+ Start Habit" on your clean blank canvas to pick a Sport, Health, or Thought preset or customize your own habit.'
+              },
+              {
+                step: '03',
+                title: 'Track Streaks & Monthly Goals',
+                desc: 'Check off habits daily, build your current and best streaks, and monitor your Goal Met ring gauge across every month.'
+              }
+            ].map((item) => (
+              <div
+                key={item.step}
+                className="relative rounded-[26px] bg-[#FAFBFD] border border-gray-100 p-7 text-center md:text-left"
+              >
+                <span className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-[#5D38F6] text-white text-sm font-extrabold shadow-md shadow-[#5D38F6]/20 mb-5">
+                  {item.step}
+                </span>
+                <h3 className="text-lg font-bold text-gray-900">{item.title}</h3>
+                <p className="text-sm text-gray-600 mt-2 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={onEnterApp}
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#5D38F6] hover:bg-[#4D29E3] text-white text-sm sm:text-base font-bold shadow-xl shadow-[#5D38F6]/25 transition active:scale-95"
+            >
+              <span>Sign In & Start Tracking</span>
+              <ArrowRightIcon className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigatePage('contact')}
+              className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 text-sm sm:text-base font-bold transition"
+            >
+              <span>Contact Support</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Accordion */}
+      <section className="py-16 sm:py-24 bg-[#FAFBFD] border-t border-gray-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#5D38F6]">
+              Questions & Answers
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-2 tracking-tight">
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          <div className="space-y-3.5">
+            {FAQ_ITEMS.map((item, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div
+                  key={item.question}
+                  className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? -1 : idx)}
+                    className="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-gray-50/70 transition"
+                  >
+                    <span className="text-sm sm:text-base font-bold text-gray-900">
+                      {item.question}
+                    </span>
+                    {isOpen ? (
+                      <ChevronUpIcon className="w-5 h-5 text-[#5D38F6] shrink-0" />
+                    ) : (
+                      <ChevronDownIcon className="w-5 h-5 text-gray-400 shrink-0" />
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div className="px-6 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-3">
+                      {item.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ============================================================================
+// PAGE 2: DEDICATED CONTACT PAGE
+// ============================================================================
+
+function ContactPageContent({ onNavigatePage, onNotify }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [topic, setTopic] = useState('General Support');
+  const [message, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !message.trim()) return;
+    setSubmitted(true);
+    onNotify('Message sent to Cozy Automations support!');
+  };
+
+  return (
+    <div className="flex-1 bg-gradient-to-b from-[#F6F4FF] via-[#FAFBFD] to-white py-12 sm:py-20">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <button
+            type="button"
+            onClick={() => onNavigatePage('home')}
+            className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-[#5D38F6] transition"
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            <span>Back to Home</span>
+          </button>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mt-3 tracking-tight">
+            Contact Us
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2 max-w-2xl">
+            Have a question about Bitry, feedback on habit features, or a privacy request?
+            Reach out directly to our team at {PUBLISHER_INFO.companyName}.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Publisher Details Card */}
+          <div className="lg:col-span-5 bg-white rounded-[28px] p-7 border border-gray-100 shadow-sm space-y-6">
+            <div>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-[#5D38F6]">
+                Developer & Publisher
+              </span>
+              <h2 className="text-xl font-extrabold text-gray-900 mt-1">
+                {PUBLISHER_INFO.companyName}
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                Official publisher of {PUBLISHER_INFO.appName}
+              </p>
+            </div>
+
+            <div className="space-y-4 text-sm">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#F3EEFF] text-[#5D38F6] flex items-center justify-center shrink-0 mt-0.5">
+                  <MailIcon className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Support Email
+                  </p>
+                  <a
+                    href={`mailto:${PUBLISHER_INFO.supportEmail}`}
+                    className="font-bold text-gray-900 hover:text-[#5D38F6] transition"
+                  >
+                    {PUBLISHER_INFO.supportEmail}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#EAFAF1] text-[#2ECC71] flex items-center justify-center shrink-0 mt-0.5">
+                  <MapPinIcon className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Registered Business Address
+                  </p>
+                  <p className="font-semibold text-gray-800 leading-relaxed">
+                    {PUBLISHER_INFO.address}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-100 text-xs text-gray-500 leading-relaxed">
+              We typically respond to all support and data-privacy inquiries within 1–2
+              business days.
+            </div>
+          </div>
+
+          {/* Interactive Contact Form */}
+          <div className="lg:col-span-7 bg-white rounded-[28px] p-7 sm:p-8 border border-gray-100 shadow-sm">
+            {submitted ? (
+              <div className="py-10 text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-[#EAFAF1] text-[#2ECC71] flex items-center justify-center mx-auto">
+                  <CheckCircle2Icon className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-extrabold text-gray-900">
+                  Thank you, {name}!
+                </h3>
+                <p className="text-sm text-gray-600 max-w-md mx-auto leading-relaxed">
+                  We have received your message regarding <strong>{topic}</strong> and will
+                  reply to <strong>{email}</strong> shortly.
+                </p>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setMessage('');
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-[#F3EEFF] text-[#5D38F6] text-xs font-bold hover:bg-[#E7DCFF] transition"
+                  >
+                    Send Another Message
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Alex Rivera"
+                      className="w-full rounded-2xl bg-[#FAFBFD] border border-gray-200 px-4 py-3 text-sm font-medium text-gray-900 focus:outline-none focus:border-[#5D38F6]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full rounded-2xl bg-[#FAFBFD] border border-gray-200 px-4 py-3 text-sm font-medium text-gray-900 focus:outline-none focus:border-[#5D38F6]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Topic
+                  </label>
+                  <select
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    className="w-full rounded-2xl bg-[#FAFBFD] border border-gray-200 px-4 py-3 text-sm font-medium text-gray-900 focus:outline-none focus:border-[#5D38F6]"
+                  >
+                    <option value="General Support">General Support</option>
+                    <option value="Feature Request">Feature Request</option>
+                    <option value="Bug Report">Bug Report</option>
+                    <option value="Privacy & Data Inquiry">Privacy & Data Inquiry</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Message
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="How can our team help you?"
+                    className="w-full rounded-2xl bg-[#FAFBFD] border border-gray-200 px-4 py-3 text-sm font-medium text-gray-900 focus:outline-none focus:border-[#5D38F6]"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#5D38F6] hover:bg-[#4D29E3] text-white text-sm font-bold shadow-lg shadow-[#5D38F6]/25 transition active:scale-95"
+                >
+                  <SendIcon className="w-4 h-4" />
+                  <span>Send Message</span>
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// PAGE 3: DEDICATED PRIVACY POLICY PAGE
+// ============================================================================
+
+function PrivacyPageContent({ onNavigatePage }) {
+  return (
+    <div className="flex-1 bg-[#FAFBFD] py-12 sm:py-20">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          onClick={() => onNavigatePage('home')}
+          className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-[#5D38F6] transition mb-4"
+        >
+          <ArrowLeftIcon className="w-4 h-4" />
+          <span>Back to Home</span>
+        </button>
+
+        <div className="bg-white rounded-[28px] p-7 sm:p-10 border border-gray-100 shadow-sm space-y-6">
+          <div className="border-b border-gray-100 pb-6">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#5D38F6]">
+              Legal & Data Safety
+            </span>
+            <h1 className="text-3xl font-extrabold text-gray-900 mt-1">
+              Privacy Policy
+            </h1>
+            <p className="text-xs text-gray-500 mt-2">
+              Effective Date: {PUBLISHER_INFO.lastUpdated} • Published by{' '}
+              {PUBLISHER_INFO.companyName}
+            </p>
+          </div>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">1. Overview</h2>
+            <p>
+              {PUBLISHER_INFO.companyName} (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or
+              &ldquo;us&rdquo;) operates the <strong>Bitry</strong> habit tracker web
+              and mobile application. We respect your privacy and designed Bitry with a
+              local-first architecture so you remain in control of your personal routines.
+            </p>
+          </section>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">
+              2. Information Stored on Your Device
+            </h2>
+            <p>
+              Habit titles, emojis, weekly frequency goals, and daily completion logs are
+              stored locally on your device using browser <code>localStorage</code>. We do
+              not transmit your personal habit logs to external advertising servers or sell
+              user data to third parties.
+            </p>
+          </section>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">
+              3. Support Communications
+            </h2>
+            <p>
+              If you voluntarily contact us via our Contact page or email{' '}
+              <a
+                href={`mailto:${PUBLISHER_INFO.supportEmail}`}
+                className="text-[#5D38F6] font-semibold underline"
+              >
+                {PUBLISHER_INFO.supportEmail}
+              </a>
+              , we use your name and email address solely to respond to your inquiry.
+            </p>
+          </section>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">
+              4. Data Deletion & User Control
+            </h2>
+            <p>
+              You can clear all stored habit data at any time directly inside the Bitry
+              app by opening <strong>Settings → Reset to Blank Screen (Clear Habits)</strong>{' '}
+              or by clearing your browser/app storage.
+            </p>
+          </section>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">5. Contact Us</h2>
+            <p>
+              For privacy questions, write to {PUBLISHER_INFO.companyName},{' '}
+              {PUBLISHER_INFO.address}, or email {PUBLISHER_INFO.supportEmail}.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// PAGE 4: DEDICATED TERMS OF SERVICE PAGE
+// ============================================================================
+
+function TermsPageContent({ onNavigatePage }) {
+  return (
+    <div className="flex-1 bg-[#FAFBFD] py-12 sm:py-20">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          onClick={() => onNavigatePage('home')}
+          className="inline-flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-[#5D38F6] transition mb-4"
+        >
+          <ArrowLeftIcon className="w-4 h-4" />
+          <span>Back to Home</span>
+        </button>
+
+        <div className="bg-white rounded-[28px] p-7 sm:p-10 border border-gray-100 shadow-sm space-y-6">
+          <div className="border-b border-gray-100 pb-6">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#5D38F6]">
+              Legal Agreement
+            </span>
+            <h1 className="text-3xl font-extrabold text-gray-900 mt-1">
+              Terms of Service
+            </h1>
+            <p className="text-xs text-gray-500 mt-2">
+              Last Updated: {PUBLISHER_INFO.lastUpdated} • {PUBLISHER_INFO.companyName}
+            </p>
+          </div>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">
+              1. Acceptance of Terms
+            </h2>
+            <p>
+              By accessing or using <strong>Bitry</strong>, you agree to be bound by these
+              Terms of Service provided by {PUBLISHER_INFO.companyName}. If you do not
+              agree, please discontinue use of the application.
+            </p>
+          </section>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">
+              2. Personal Productivity Use Only
+            </h2>
+            <p>
+              Bitry is a personal habit-tracking and self-organization tool. It does not
+              provide medical, clinical, psychological, or professional health advice.
+            </p>
+          </section>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">
+              3. Intellectual Property
+            </h2>
+            <p>
+              All visual designs, user interface components, branding, and software code
+              within Bitry are the property of {PUBLISHER_INFO.companyName} and are
+              protected by applicable intellectual property laws.
+            </p>
+          </section>
+
+          <section className="space-y-2 text-sm text-gray-600 leading-relaxed">
+            <h2 className="text-base font-extrabold text-gray-900">
+              4. Disclaimer & Limitation of Liability
+            </h2>
+            <p>
+              Bitry is provided &ldquo;as is&rdquo; without warranties of any kind. Because
+              habit records are stored locally on your device, you are responsible for
+              maintaining backups of your browser or device data.
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// BITRY HABIT TRACKER APP COMPONENT (4 Screens + Settings Home Page Button)
+// ============================================================================
+
+function BitryTrackerApp({ onGoHome, onOpenLegal }) {
+  const storageKey = 'bitry_habits_workspace_v1';
+
+  // Start with a clean blank habit state by default
   const [habits, setHabits] = useState(() => {
     try {
-      const saved = localStorage.getItem('bitree_habits_blank_v1');
+      const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return parsed;
@@ -403,33 +1790,30 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('bitree_habits_blank_v1', JSON.stringify(habits));
+      localStorage.setItem(storageKey, JSON.stringify(habits));
     } catch (e) {
       console.error('Failed to save habits to localStorage:', e);
     }
-  }, [habits]);
+  }, [habits, storageKey]);
 
-  // Navigation & UI state
-  // Tabs: 'today' | 'statistics' | 'add'
+  // Navigation & UI state ('today' | 'statistics' | 'add')
   const [activeTab, setActiveTab] = useState('today');
   const [selectedDate, setSelectedDate] = useState(INITIAL_TODAY_STR);
-
-  // Horizontal strip offset (centered around the 7-day window starting Friday Nov 6, 2026 to Thursday Nov 12, 2026 as shown in Screenshot 1)
   const [stripStartDate, setStripStartDate] = useState('2026-11-06');
 
-  // Detail modal state (Screenshot 3)
+  // Detail modal state
   const [detailHabitId, setDetailHabitId] = useState(null);
-  const [calendarMonth, setCalendarMonth] = useState({ year: 2026, month: 10 }); // 10 = November (0-indexed)
+  const [calendarMonth, setCalendarMonth] = useState({ year: 2026, month: 10 });
 
-  // Statistics week start (Monday Nov 9, 2026 as shown in Screenshot 2: 9 Nov - 15 Nov)
+  // Statistics week start
   const [statsWeekMonday, setStatsWeekMonday] = useState('2026-11-09');
 
-  // Action menu state for a habit card's `⋮` button
+  // Action menu state for habit cards
   const [openMenuHabitId, setOpenMenuHabitId] = useState(null);
 
   // Add / Edit Habit modal & accordion state
   const [expandedCategory, setExpandedCategory] = useState('sport');
-  const [habitFormModal, setHabitFormModal] = useState(null); // { mode: 'create' | 'edit', habitData }
+  const [habitFormModal, setHabitFormModal] = useState(null);
   const [deleteConfirmHabit, setDeleteConfirmHabit] = useState(null);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -441,7 +1825,6 @@ export default function App() {
     }, 2400);
   };
 
-  // Close 3-dots menu when clicking outside
   useEffect(() => {
     const handleClickOutside = () => setOpenMenuHabitId(null);
     window.addEventListener('click', handleClickOutside);
@@ -449,10 +1832,9 @@ export default function App() {
   }, []);
 
   // ============================================================================
-  // HABIT ACTIONS
+  // HABIT CRUD ACTIONS
   // ============================================================================
 
-  // Toggle completion on Today screen
   const toggleHabitOnDate = (habitId, dateStr) => {
     setHabits((prev) =>
       prev.map((h) => {
@@ -469,7 +1851,6 @@ export default function App() {
     );
   };
 
-  // Cycle status on Detail Calendar (done -> missed -> clear -> done)
   const cycleHabitCalendarDay = (habitId, dateStr) => {
     setHabits((prev) =>
       prev.map((h) => {
@@ -545,11 +1926,11 @@ export default function App() {
     setStripStartDate('2026-11-06');
     setStatsWeekMonday('2026-11-09');
     setSettingsModalOpen(false);
-    showToast('Loaded sample Bitree habits & history');
+    showToast('Loaded sample Bitry habits & history');
   };
 
   // ============================================================================
-  // DERIVED DATA FOR TODAY VIEW
+  // DERIVED DATA
   // ============================================================================
 
   const stripDays = useMemo(() => {
@@ -558,33 +1939,18 @@ export default function App() {
       const dt = parseDateStr(dStr);
       const dayLabel = SHORT_DAY_NAMES[dt.getDay()];
       const dayNum = dt.getDate();
-
-      // Calculate how many habits were completed on dStr
       const doneCount = habits.filter((h) => h.logs?.[dStr] === 'done').length;
       const totalCount = habits.length;
-
-      return {
-        dateStr: dStr,
-        dayLabel,
-        dayNum,
-        doneCount,
-        totalCount
-      };
+      return { dateStr: dStr, dayLabel, dayNum, doneCount, totalCount };
     });
   }, [stripStartDate, habits]);
 
   const selectedDayProgress = useMemo(() => {
     const total = habits.length;
     const completed = habits.filter((h) => h.logs?.[selectedDate] === 'done').length;
-    // Notice in Screenshot 1: 4 habits are visible in the viewport (Work, Plan, Pray, Journal) with 2 checked = 50% bar width.
-    // Let's compute exact percentage so when 2 are checked it fills smoothly.
     const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
     return { completed, total, percent };
   }, [habits, selectedDate]);
-
-  // ============================================================================
-  // DERIVED DATA FOR STATISTICS VIEW (Screenshot 2)
-  // ============================================================================
 
   const statsData = useMemo(() => {
     const days = Array.from({ length: 7 }, (_, i) => {
@@ -593,12 +1959,7 @@ export default function App() {
       const label = `${dt.getDate()} ${SHORT_MONTH_NAMES[dt.getMonth()]}`;
       const doneCount = habits.filter((h) => h.logs?.[dStr] === 'done').length;
       const ratio = habits.length > 0 ? doneCount / habits.length : 0;
-      return {
-        dateStr: dStr,
-        label,
-        doneCount,
-        ratio
-      };
+      return { dateStr: dStr, label, doneCount, ratio };
     });
 
     const totalTargetInWeek = habits.reduce((acc, h) => acc + (h.targetPerWeek || 7), 0);
@@ -609,21 +1970,13 @@ export default function App() {
       totalDoneInWeek += doneInWeek;
       const target = h.targetPerWeek || 7;
       const pct = target > 0 ? Math.round((doneInWeek / target) * 100) : 0;
-      return {
-        ...h,
-        doneInWeek,
-        target,
-        pct
-      };
+      return { ...h, doneInWeek, target, pct };
     });
 
-    // Sort per-habit breakdown so completed habits appear at the top (matching Screenshot 2: Pray 14%, Journal 14%, Exercise 0%, Work 0%, Plan 0%)
     const sortedHabits = [...perHabitStats].sort((a, b) => b.pct - a.pct);
-
     const overallPercent =
       totalTargetInWeek > 0 ? Math.round((totalDoneInWeek / totalTargetInWeek) * 100) : 0;
 
-    // Format range label (e.g., "Today - 15 November" when week starts on INITIAL_TODAY_STR)
     const startDt = parseDateStr(statsWeekMonday);
     const endDt = parseDateStr(addDays(statsWeekMonday, 6));
     const rangeLabel =
@@ -641,15 +1994,10 @@ export default function App() {
     };
   }, [habits, statsWeekMonday]);
 
-  // Active habit for History & Detail Modal (Screenshot 3)
   const detailHabit = useMemo(
     () => habits.find((h) => h.id === detailHabitId) || null,
     [habits, detailHabitId]
   );
-
-  // ============================================================================
-  // RENDER HELPERS
-  // ============================================================================
 
   const openHabitDetail = (habitId) => {
     setDetailHabitId(habitId);
@@ -661,27 +2009,21 @@ export default function App() {
     <div className="min-h-screen bg-[#ECEEF4] flex flex-col items-center justify-start sm:justify-center sm:py-6 font-sans text-[#1C1C28] select-none">
       {/* Mobile Phone Frame Container */}
       <div className="w-full max-w-[430px] min-h-screen sm:min-h-[860px] sm:max-h-[900px] bg-[#FAFBFD] sm:rounded-[42px] sm:shadow-[0_24px_70px_rgba(20,20,45,0.16)] sm:border-[6px] sm:border-white flex flex-col relative overflow-hidden">
-        
-        {/* Subtle Bitree Brand Pill + Simulated Status Bar on Desktop Frame */}
+        {/* Top App Bar with Brand & Home Page Link */}
         <div className="px-6 pt-3 pb-1 flex items-center justify-between text-xs font-semibold text-gray-800 bg-white">
           <div className="flex items-center gap-1.5">
-            <span>17:55</span>
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-[#6236FF]/10 text-[#6236FF] tracking-tight">
-              🌱 Bitree
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-[#6236FF]/10 text-[#6236FF] tracking-tight">
+              🌱 Bitry
             </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="flex items-end gap-[2px] h-3">
-              <span className="w-[3px] h-1.5 bg-gray-900 rounded-full"></span>
-              <span className="w-[3px] h-2 bg-gray-900 rounded-full"></span>
-              <span className="w-[3px] h-2.5 bg-gray-900 rounded-full"></span>
-              <span className="w-[3px] h-3 bg-gray-900 rounded-full"></span>
-            </div>
-            <span className="text-[11px] font-bold tracking-tight">LTE</span>
-            <div className="w-6 h-3 rounded-[4px] border border-gray-400 p-[1.5px] flex items-center">
-              <div className="w-3.5 h-full bg-gray-800 rounded-[2px]"></div>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={onGoHome}
+            className="text-[11px] font-bold text-gray-500 hover:text-[#5D38F6] transition"
+            title="Return to Bitry Home Page"
+          >
+            Home Page
+          </button>
         </div>
 
         {/* =================================================================== */}
@@ -689,25 +2031,28 @@ export default function App() {
         {/* =================================================================== */}
         {activeTab === 'today' && !detailHabit && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Top Header */}
             <header className="px-5 pt-3 pb-4 bg-white flex items-center justify-between">
               <button
+                type="button"
                 onClick={() => setSettingsModalOpen(true)}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-gray-900 hover:bg-gray-100 active:scale-95 transition"
-                title="Bitree Settings"
+                title="Bitry Settings"
               >
-                <Settings className="w-[22px] h-[22px] stroke-[2.2]" />
+                <SettingsIcon className="w-[22px] h-[22px]" />
               </button>
 
               <div className="flex flex-col items-center">
                 <h1 className="text-[19px] font-bold tracking-tight text-gray-900">
                   {selectedDate === INITIAL_TODAY_STR
                     ? 'Today'
-                    : `${ parseDateStr(selectedDate).getDate() } ${ SHORT_MONTH_NAMES[parseDateStr(selectedDate).getMonth()] }`}
+                    : `${parseDateStr(selectedDate).getDate()} ${
+                        SHORT_MONTH_NAMES[parseDateStr(selectedDate).getMonth()]
+                      }`}
                 </h1>
               </div>
 
               <button
+                type="button"
                 onClick={() => {
                   setSelectedDate(INITIAL_TODAY_STR);
                   setStripStartDate('2026-11-06');
@@ -716,7 +2061,7 @@ export default function App() {
                 className="w-10 h-10 rounded-full flex items-center justify-center text-gray-900 hover:bg-gray-100 active:scale-95 transition"
                 title="Jump to Today"
               >
-                <CalendarIcon className="w-[21px] h-[21px] stroke-[2.2]" />
+                <CalendarIcon className="w-[21px] h-[21px]" />
               </button>
             </header>
 
@@ -724,11 +2069,12 @@ export default function App() {
             <div className="bg-white px-2 pb-3 relative">
               <div className="flex items-center justify-between gap-1.5">
                 <button
+                  type="button"
                   onClick={() => setStripStartDate((prev) => addDays(prev, -7))}
                   className="p-1 text-gray-400 hover:text-gray-700 active:scale-90 transition"
                   title="Previous Week"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeftIcon className="w-4 h-4" />
                 </button>
 
                 <div className="flex-1 grid grid-cols-7 gap-1.5">
@@ -736,7 +2082,6 @@ export default function App() {
                     const isSelected = item.dateStr === selectedDate;
                     const isPastOrToday = item.dateStr <= INITIAL_TODAY_STR;
 
-                    // Determine border style matching Screenshot 1 when habits exist
                     let borderColorClass = 'border-[#EFEFF4] text-gray-900 bg-white';
                     if (isSelected) {
                       borderColorClass =
@@ -752,6 +2097,7 @@ export default function App() {
                     return (
                       <div key={item.dateStr} className="flex flex-col items-center">
                         <button
+                          type="button"
                           onClick={() => setSelectedDate(item.dateStr)}
                           className={`w-full py-2 rounded-[14px] border-[1.6px] flex flex-col items-center justify-center transition-all duration-200 active:scale-95 ${borderColorClass}`}
                         >
@@ -770,7 +2116,6 @@ export default function App() {
                             {item.dayNum}
                           </span>
                         </button>
-                        {/* Active indicator dot underneath selected day */}
                         <div className="h-2.5 flex items-center justify-center">
                           {isSelected && (
                             <span className="w-1.5 h-1.5 rounded-full bg-[#5D38F6]"></span>
@@ -782,16 +2127,17 @@ export default function App() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setStripStartDate((prev) => addDays(prev, 7))}
                   className="p-1 text-gray-400 hover:text-gray-700 active:scale-90 transition"
                   title="Next Week"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRightIcon className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Progress Card - Only shown once the user has added at least 1 habit */}
+            {/* Progress Card */}
             {habits.length > 0 && (
               <div className="bg-white px-5 pt-2 pb-5 rounded-b-[24px] shadow-[0_4px_14px_rgba(0,0,0,0.03)] z-10">
                 <div className="flex items-center justify-between mb-2.5">
@@ -809,14 +2155,15 @@ export default function App() {
               </div>
             )}
 
-            {/* Main Content Area: Clean Blank Screen with little "Start Habit" button when 0 habits */}
+            {/* Clean Blank Screen with Compact "Start Habit" Button when 0 habits */}
             {habits.length === 0 ? (
               <div className="flex-1 bg-white flex flex-col items-center justify-center px-6 pb-28">
                 <button
+                  type="button"
                   onClick={() => setActiveTab('add')}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#5E2CED] hover:bg-[#4F23CC] text-white text-xs font-bold tracking-wide shadow-[0_8px_20px_rgba(94,44,237,0.28)] active:scale-95 transition-all"
                 >
-                  <Plus className="w-4 h-4 stroke-[2.8]" />
+                  <PlusIcon className="w-4 h-4" />
                   <span>Start Habit</span>
                 </button>
               </div>
@@ -836,7 +2183,6 @@ export default function App() {
                       className="bg-white rounded-[20px] border-[1.8px] px-4 py-4 flex items-center justify-between shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-md transition-all cursor-pointer relative group"
                     >
                       <div className="flex items-center gap-3.5">
-                        {/* Circular Checkbox */}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -850,10 +2196,9 @@ export default function App() {
                           className="w-[30px] h-[30px] rounded-full border-[1.8px] flex items-center justify-center transition-all duration-200 active:scale-90 shrink-0"
                           aria-label={`Mark ${habit.name} as ${isDone ? 'incomplete' : 'complete'}`}
                         >
-                          {isDone && <Check className="w-4 h-4 text-white stroke-[3]" />}
+                          {isDone && <CheckIcon className="w-4 h-4 text-white" />}
                         </button>
 
-                        {/* Habit Title + Emoji */}
                         <div className="flex items-center gap-1.5">
                           <span className="text-[16px] font-bold text-gray-900 tracking-tight">
                             {habit.name}
@@ -862,7 +2207,6 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Right 3-Dots Button */}
                       <div className="relative">
                         <button
                           type="button"
@@ -875,26 +2219,27 @@ export default function App() {
                           className="w-9 h-9 rounded-[10px] bg-[#F5F6F9] hover:bg-[#EAECEF] flex items-center justify-center text-gray-500 transition active:scale-95"
                           aria-label="Habit options"
                         >
-                          <MoreVertical className="w-4 h-4" />
+                          <MoreVerticalIcon className="w-4 h-4" />
                         </button>
 
-                        {/* Action Popover Menu */}
                         {openMenuHabitId === habit.id && (
                           <div
                             onClick={(e) => e.stopPropagation()}
-                            className="absolute right-0 top-11 w-44 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.14)] border border-gray-100 py-1.5 z-30 animate-in fade-in zoom-in-95 duration-150"
+                            className="absolute right-0 top-11 w-44 bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.14)] border border-gray-100 py-1.5 z-30"
                           >
                             <button
+                              type="button"
                               onClick={() => {
                                 setOpenMenuHabitId(null);
                                 openHabitDetail(habit.id);
                               }}
                               className="w-full px-3.5 py-2 text-left text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
                             >
-                              <History className="w-3.5 h-3.5 text-[#5D38F6]" />
+                              <HistoryIcon className="w-3.5 h-3.5 text-[#5D38F6]" />
                               View History & Calendar
                             </button>
                             <button
+                              type="button"
                               onClick={() => {
                                 setOpenMenuHabitId(null);
                                 setHabitFormModal({
@@ -904,18 +2249,19 @@ export default function App() {
                               }}
                               className="w-full px-3.5 py-2 text-left text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
                             >
-                              <Edit3 className="w-3.5 h-3.5 text-amber-500" />
+                              <Edit3Icon className="w-3.5 h-3.5 text-amber-500" />
                               Edit Habit
                             </button>
                             <div className="my-1 border-t border-gray-100" />
                             <button
+                              type="button"
                               onClick={() => {
                                 setOpenMenuHabitId(null);
                                 setDeleteConfirmHabit(habit);
                               }}
                               className="w-full px-3.5 py-2 text-left text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2.5"
                             >
-                              <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                              <Trash2Icon className="w-3.5 h-3.5 text-red-500" />
                               Delete Habit
                             </button>
                           </div>
@@ -930,18 +2276,18 @@ export default function App() {
         )}
 
         {/* =================================================================== */}
-        {/* SCREEN 2: STATISTICS VIEW (Matches Screenshot 2)                    */}
+        {/* SCREEN 2: STATISTICS VIEW                                           */}
         {/* =================================================================== */}
         {activeTab === 'statistics' && !detailHabit && (
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Top Header */}
             <header className="px-5 pt-3 pb-3 bg-white flex items-center justify-between">
               <button
+                type="button"
                 onClick={() => setSettingsModalOpen(true)}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-gray-900 hover:bg-gray-100 active:scale-95 transition"
                 title="Settings"
               >
-                <Settings className="w-[22px] h-[22px] stroke-[2.2]" />
+                <SettingsIcon className="w-[22px] h-[22px]" />
               </button>
               <h1 className="text-[19px] font-bold tracking-tight text-gray-900">
                 Statistics
@@ -950,9 +2296,7 @@ export default function App() {
             </header>
 
             <div className="flex-1 overflow-y-auto pb-28">
-              {/* Top Chart Card */}
               <div className="bg-white px-5 pt-2 pb-5 shadow-[0_4px_14px_rgba(0,0,0,0.02)]">
-                {/* Total Done Header Row */}
                 <div className="flex items-baseline justify-between">
                   <span className="text-[19px] font-bold text-gray-900">Total Done</span>
                   <span className="text-[19px] font-bold text-gray-900">
@@ -970,7 +2314,6 @@ export default function App() {
 
                 {/* Vertical Bar Chart with Dashed Grid Lines */}
                 <div className="relative h-48 pt-2 pb-6 px-1">
-                  {/* 5 Horizontal Dashed Grid Lines */}
                   <div className="absolute inset-x-0 top-2 bottom-6 flex flex-col justify-between pointer-events-none">
                     {[0, 1, 2, 3, 4].map((lineIdx) => (
                       <div
@@ -980,7 +2323,6 @@ export default function App() {
                     ))}
                   </div>
 
-                  {/* 7 Rounded Bar Pillars */}
                   <div className="relative z-10 h-full grid grid-cols-7 gap-3 items-end">
                     {statsData.days.map((dayObj) => {
                       const heightPct = Math.round(dayObj.ratio * 100);
@@ -994,9 +2336,7 @@ export default function App() {
                           className="h-full flex flex-col items-center justify-end group cursor-pointer"
                           title={`${dayObj.label}: ${dayObj.doneCount} completed`}
                         >
-                          {/* Full height gray track */}
                           <div className="w-6 h-full bg-[#F5F6F8] rounded-full flex flex-col justify-end overflow-hidden p-0">
-                            {/* Animated Emerald Green Fill */}
                             <div
                               className="w-full bg-[#2ECC71] rounded-full transition-all duration-500 ease-out"
                               style={{
@@ -1010,7 +2350,6 @@ export default function App() {
                     })}
                   </div>
 
-                  {/* X-Axis Labels */}
                   <div className="grid grid-cols-7 gap-1 mt-2 text-center">
                     {statsData.days.map((dayObj) => (
                       <span
@@ -1023,46 +2362,46 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Week Switcher Row */}
                 <div className="flex items-center justify-between px-4 pt-3">
                   <button
+                    type="button"
                     onClick={() => setStatsWeekMonday((prev) => addDays(prev, -7))}
                     className="p-2 rounded-full hover:bg-gray-100 text-gray-700 active:scale-90 transition"
                     aria-label="Previous week"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeftIcon className="w-5 h-5" />
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => setStatsWeekMonday(INITIAL_TODAY_STR)}
                     className="flex items-center gap-1.5 text-[16px] font-bold text-gray-900 hover:opacity-80 transition"
                   >
                     <span>{statsData.rangeLabel}</span>
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                    <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => setStatsWeekMonday((prev) => addDays(prev, 7))}
                     className="p-2 rounded-full hover:bg-gray-100 text-gray-700 active:scale-90 transition"
                     aria-label="Next week"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRightIcon className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              {/* Per-Habit Breakdown List */}
               <div className="px-5 pt-4 space-y-3">
                 {statsData.sortedHabits.length === 0 ? (
                   <div className="py-12 flex flex-col items-center justify-center text-center">
-                    <p className="text-xs text-gray-400 mb-3">
-                      No habits tracked yet
-                    </p>
+                    <p className="text-xs text-gray-400 mb-3">No habits tracked yet</p>
                     <button
+                      type="button"
                       onClick={() => setActiveTab('add')}
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#5E2CED] hover:bg-[#4F23CC] text-white text-xs font-bold shadow-md shadow-[#5E2CED]/20 active:scale-95 transition"
                     >
-                      <Plus className="w-3.5 h-3.5 stroke-[2.8]" />
+                      <PlusIcon className="w-3.5 h-3.5" />
                       <span>Start Habit</span>
                     </button>
                   </div>
@@ -1090,7 +2429,7 @@ export default function App() {
                           {h.pct}%
                         </span>
                         <div className="flex items-center justify-end gap-0.5 text-[12px] font-semibold text-[#E74C3C] mt-0.5">
-                          <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <ChevronDownIcon className="w-3.5 h-3.5" />
                           <span>{h.prevWeekTrend || 80}%</span>
                         </div>
                       </div>
@@ -1103,25 +2442,25 @@ export default function App() {
         )}
 
         {/* =================================================================== */}
-        {/* SCREEN 3: ADD HABIT SCREEN (Matches Screenshot 4)                   */}
+        {/* SCREEN 3: ADD HABIT SCREEN                                          */}
         {/* =================================================================== */}
         {activeTab === 'add' && !detailHabit && (
           <div className="flex-1 flex flex-col overflow-hidden bg-[#F8F9FB]">
-            {/* Top Bar */}
             <header className="px-5 pt-3 pb-4 bg-white rounded-b-[24px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] flex items-center justify-between">
               <button
+                type="button"
                 onClick={() => setActiveTab('today')}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-gray-900 hover:bg-gray-100 active:scale-95 transition"
               >
-                <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
+                <ArrowLeftIcon className="w-5 h-5" />
               </button>
               <h1 className="text-[18px] font-bold text-gray-900">Add Habit</h1>
               <div className="w-10" />
             </header>
 
             <div className="flex-1 overflow-y-auto px-5 pt-5 pb-28 space-y-5">
-              {/* Custom Habit Pill Button */}
               <button
+                type="button"
                 onClick={() =>
                   setHabitFormModal({
                     mode: 'create',
@@ -1141,15 +2480,15 @@ export default function App() {
                     Custom Habit
                   </span>
                 </div>
-                <Plus className="w-5 h-5 text-[#5D38F6] stroke-[2.2]" />
+                <PlusIcon className="w-5 h-5 text-[#5D38F6]" />
               </button>
 
-              {/* Preset Categories Accordion */}
               {PRESET_CATEGORIES.map((category) => {
                 const isExpanded = expandedCategory === category.id;
                 return (
                   <div key={category.id} className="space-y-3">
                     <button
+                      type="button"
                       onClick={() =>
                         setExpandedCategory((prev) =>
                           prev === category.id ? null : category.id
@@ -1161,9 +2500,9 @@ export default function App() {
                         {category.title}
                       </span>
                       {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-gray-800" />
+                        <ChevronUpIcon className="w-5 h-5 text-gray-800" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-800" />
+                        <ChevronDownIcon className="w-5 h-5 text-gray-800" />
                       )}
                     </button>
 
@@ -1171,6 +2510,7 @@ export default function App() {
                       <div className="bg-white rounded-[22px] divide-y divide-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
                         {category.items.map((preset) => (
                           <button
+                            type="button"
                             key={preset.name}
                             onClick={() =>
                               setHabitFormModal({
@@ -1188,7 +2528,7 @@ export default function App() {
                                 {preset.name}
                               </span>
                             </div>
-                            <ChevronRight className="w-4 h-4 text-gray-400" />
+                            <ChevronRightIcon className="w-4 h-4 text-gray-400" />
                           </button>
                         ))}
                       </div>
@@ -1201,7 +2541,7 @@ export default function App() {
         )}
 
         {/* =================================================================== */}
-        {/* SCREEN 4: HABIT HISTORY & DETAIL VIEW (Matches Screenshot 3)        */}
+        {/* SCREEN 4: HABIT HISTORY & DETAIL VIEW                               */}
         {/* =================================================================== */}
         {detailHabit && (
           <HabitHistoryDetailView
@@ -1227,12 +2567,11 @@ export default function App() {
         {/* =================================================================== */}
         {!detailHabit && activeTab !== 'add' && (
           <nav className="absolute bottom-0 inset-x-0 bg-white rounded-t-[28px] shadow-[0_-8px_30px_rgba(0,0,0,0.06)] px-8 py-2.5 flex items-center justify-between z-20">
-            {/* Left Tab: Habits */}
             <button
+              type="button"
               onClick={() => setActiveTab('today')}
               className="flex flex-col items-center justify-center gap-1 py-1 px-4 active:scale-95 transition"
             >
-              {/* Custom Checklist Icon matching Screenshot 1 */}
               <svg
                 className="w-6 h-6"
                 viewBox="0 0 24 24"
@@ -1258,21 +2597,20 @@ export default function App() {
               </span>
             </button>
 
-            {/* Center Purple Floating Action Button (+) */}
             <button
+              type="button"
               onClick={() => setActiveTab('add')}
               className="w-[56px] h-[56px] rounded-full bg-[#5D38F6] hover:bg-[#502CE3] text-white flex items-center justify-center shadow-[0_8px_22px_rgba(93,56,246,0.38)] active:scale-90 transition-transform"
               aria-label="Add Habit"
             >
-              <Plus className="w-7 h-7 stroke-[2.8]" />
+              <PlusIcon className="w-7 h-7" />
             </button>
 
-            {/* Right Tab: Statistic */}
             <button
+              type="button"
               onClick={() => setActiveTab('statistics')}
               className="flex flex-col items-center justify-center gap-1 py-1 px-4 active:scale-95 transition"
             >
-              {/* Custom Bar Chart Icon matching Screenshot 1 & 2 */}
               <svg
                 className="w-6 h-6"
                 viewBox="0 0 24 24"
@@ -1309,25 +2647,27 @@ export default function App() {
         {/* MODAL: DELETE CONFIRMATION                                          */}
         {/* =================================================================== */}
         {deleteConfirmHabit && (
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-6 z-50 animate-in fade-in duration-150">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-6 z-50">
             <div className="bg-white w-full rounded-[26px] p-6 shadow-2xl text-center">
               <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-3">
-                <Trash2 className="w-6 h-6" />
+                <Trash2Icon className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-gray-900">
-                Delete "{deleteConfirmHabit.name} {deleteConfirmHabit.emoji}"?
+                Delete &ldquo;{deleteConfirmHabit.name} {deleteConfirmHabit.emoji}&rdquo;?
               </h3>
               <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
-                This will remove the habit and all of its tracked history from Bitree.
+                This will remove the habit and all of its tracked history from Bitry.
               </p>
               <div className="grid grid-cols-2 gap-3 mt-6">
                 <button
+                  type="button"
                   onClick={() => setDeleteConfirmHabit(null)}
                   className="py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm transition"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDeleteHabit(deleteConfirmHabit.id)}
                   className="py-2.5 rounded-xl bg-[#E74C3C] hover:bg-red-600 text-white font-semibold text-sm shadow-md shadow-red-500/20 transition"
                 >
@@ -1339,63 +2679,93 @@ export default function App() {
         )}
 
         {/* =================================================================== */}
-        {/* MODAL: BITREE SETTINGS & DEMO RESET                                 */}
+        {/* MODAL: BITRY SETTINGS & HOME PAGE NAVIGATION                        */}
         {/* =================================================================== */}
         {settingsModalOpen && (
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-end sm:items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-            <div className="bg-white w-full rounded-[28px] p-6 shadow-2xl">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-end sm:items-center justify-center p-4 z-50">
+            <div className="bg-white w-full rounded-[28px] p-6 shadow-2xl max-h-[88vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-[#5D38F6] text-white flex items-center justify-center font-bold text-lg">
                     🌱
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-gray-900">Bitree</h3>
-                    <p className="text-[11px] text-gray-400">
-                      Personal Habit & Streak Tracker
+                    <h3 className="text-base font-bold text-gray-900">Bitry Settings</h3>
+                    <p className="text-[11px] text-gray-500">
+                      Personal Habit & Streak Workspace
                     </p>
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setSettingsModalOpen(false)}
                   className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
                 >
-                  <X className="w-5 h-5" />
+                  <XIcon className="w-5 h-5" />
                 </button>
-              </div>
-
-              <div className="bg-[#F8F9FB] rounded-2xl p-4 space-y-2 text-xs text-gray-600 mb-5">
-                <p className="font-semibold text-gray-800">Quick Tips:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Tap <strong>Start Habit</strong> or the purple <strong>+</strong> button to create habits.</li>
-                  <li>Tap the circle on the left of a habit card to check it off.</li>
-                  <li>Tap a habit card to view its monthly calendar & streak stats.</li>
-                </ul>
               </div>
 
               <div className="space-y-2.5">
                 <button
-                  onClick={handleClearAllHabits}
-                  className="w-full py-3 rounded-xl border border-red-100 bg-red-50/50 hover:bg-red-50 text-red-600 font-semibold text-xs flex items-center justify-center gap-2 transition"
+                  type="button"
+                  onClick={() => {
+                    setSettingsModalOpen(false);
+                    onGoHome();
+                  }}
+                  className="w-full py-3.5 rounded-xl bg-[#5D38F6] hover:bg-[#4D29E3] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-[#5D38F6]/20 transition"
                 >
-                  <Trash2 className="w-4 h-4" />
-                  Reset to Blank Screen (Clear All Habits)
+                  <HomeIcon className="w-4 h-4" />
+                  <span>Home Page</span>
                 </button>
+
                 <button
+                  type="button"
                   onClick={handleResetDemoData}
                   className="w-full py-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-xs flex items-center justify-center gap-2 transition"
                 >
-                  <RotateCcw className="w-4 h-4 text-[#5D38F6]" />
-                  Load Sample Habits (Nov 2026 Demo)
+                  <RotateCcwIcon className="w-4 h-4 text-[#5D38F6]" />
+                  <span>Load Sample Habits (Nov 2026 Demo)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleClearAllHabits}
+                  className="w-full py-3 rounded-xl border border-red-100 bg-red-50/50 hover:bg-red-50 text-red-600 font-semibold text-xs flex items-center justify-center gap-2 transition"
+                >
+                  <Trash2Icon className="w-4 h-4" />
+                  <span>Reset to Blank Screen (Clear Habits)</span>
+                </button>
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-center gap-4 text-[11px] font-semibold text-gray-400">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSettingsModalOpen(false);
+                    onOpenLegal('privacy');
+                  }}
+                  className="hover:text-[#5D38F6]"
+                >
+                  Privacy Policy
+                </button>
+                <span>•</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSettingsModalOpen(false);
+                    onOpenLegal('terms');
+                  }}
+                  className="hover:text-[#5D38F6]"
+                >
+                  Terms of Service
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Toast Feedback Banner */}
         {toastMessage && (
-          <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg z-50 animate-in fade-in slide-in-from-top-2">
+          <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg z-50">
             {toastMessage}
           </div>
         )}
@@ -1405,7 +2775,7 @@ export default function App() {
 }
 
 // ============================================================================
-// SUB-COMPONENT: HABIT HISTORY & DETAIL VIEW (Matches Screenshot 3)
+// SUB-COMPONENT: HABIT HISTORY & DETAIL VIEW
 // ============================================================================
 
 function HabitHistoryDetailView({
@@ -1419,18 +2789,13 @@ function HabitHistoryDetailView({
 }) {
   const { year, month } = calendarMonth;
 
-  // Build 42-cell (6 rows x 7 cols, Mon-Sun) calendar grid for the selected month
   const calendarCells = useMemo(() => {
     const firstDayOfMonth = new Date(year, month, 1);
     const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
-
-    // Convert JS Sunday=0..Saturday=6 into Monday=0..Sunday=6
     const startOffset = (firstDayOfMonth.getDay() + 6) % 7;
-
     const prevMonthDays = new Date(year, month, 0).getDate();
     const cells = [];
 
-    // Leading days from previous month
     for (let i = startOffset - 1; i >= 0; i--) {
       const dayNum = prevMonthDays - i;
       const dt = new Date(year, month - 1, dayNum, 12, 0, 0);
@@ -1441,7 +2806,6 @@ function HabitHistoryDetailView({
       });
     }
 
-    // Current month days
     for (let d = 1; d <= daysInCurrentMonth; d++) {
       const dt = new Date(year, month, d, 12, 0, 0);
       cells.push({
@@ -1451,7 +2815,6 @@ function HabitHistoryDetailView({
       });
     }
 
-    // Trailing days from next month to fill 6 rows (42 cells)
     let nextMonthDay = 1;
     while (cells.length < 42) {
       const dt = new Date(year, month + 1, nextMonthDay, 12, 0, 0);
@@ -1471,7 +2834,6 @@ function HabitHistoryDetailView({
     [habit, year, month]
   );
 
-  // SVG Ring Gauge parameters
   const radius = 64;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset =
@@ -1485,15 +2847,15 @@ function HabitHistoryDetailView({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#FAFBFD] overflow-y-auto pb-8 animate-in fade-in duration-150">
-      {/* Top Bar matching Screenshot 3 */}
+    <div className="flex-1 flex flex-col bg-[#FAFBFD] overflow-y-auto pb-8">
       <header className="px-5 pt-3 pb-4 bg-white flex items-center justify-between">
         <button
+          type="button"
           onClick={onClose}
           className="w-10 h-10 rounded-full flex items-center justify-center text-gray-900 hover:bg-gray-100 active:scale-90 transition"
           aria-label="Close detail view"
         >
-          <X className="w-5 h-5 stroke-[2.2]" />
+          <XIcon className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-1.5">
@@ -1503,69 +2865,62 @@ function HabitHistoryDetailView({
 
         <div className="flex items-center gap-1">
           <button
+            type="button"
             onClick={onEdit}
             className="w-9 h-9 rounded-full flex items-center justify-center text-gray-900 hover:bg-gray-100 active:scale-90 transition"
             title="Edit Habit"
           >
-            <Edit3 className="w-[19px] h-[19px] stroke-[2.1]" />
+            <Edit3Icon className="w-[19px] h-[19px]" />
           </button>
           <button
+            type="button"
             onClick={onDelete}
             className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 active:scale-90 transition"
             title="Delete Habit"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2Icon className="w-4 h-4" />
           </button>
         </div>
       </header>
 
-      {/* Main Calendar Card */}
       <div className="mx-5 mt-3 bg-white rounded-[24px] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-        {/* Month Title & Arrows */}
         <div className="flex items-center justify-between mb-5 px-1">
           <h2 className="text-[22px] font-medium text-gray-900 tracking-tight">
             {SHORT_MONTH_NAMES[month]} {year}
           </h2>
           <div className="flex items-center gap-4">
             <button
+              type="button"
               onClick={() => stepMonth(-1)}
               className="p-1 text-gray-700 hover:text-black active:scale-90 transition"
               aria-label="Previous month"
             >
-              <ChevronLeft className="w-5 h-5 stroke-[2]" />
+              <ChevronLeftIcon className="w-5 h-5" />
             </button>
             <button
+              type="button"
               onClick={() => stepMonth(1)}
               className="p-1 text-gray-400 hover:text-black active:scale-90 transition"
               aria-label="Next month"
             >
-              <ChevronRight className="w-5 h-5 stroke-[2]" />
+              <ChevronRightIcon className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Weekday Headers: M T W T F S S */}
         <div className="grid grid-cols-7 gap-2 text-center mb-3">
           {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, idx) => (
-            <span
-              key={idx}
-              className="text-[14px] font-medium text-gray-400"
-            >
+            <span key={idx} className="text-[14px] font-medium text-gray-400">
               {d}
             </span>
           ))}
         </div>
 
-        {/* 6x7 Day Cells Grid */}
         <div className="grid grid-cols-7 gap-2">
           {calendarCells.map((cell) => {
-            const status = habit.logs?.[cell.dateStr]; // 'done' | 'missed' | undefined
+            const status = habit.logs?.[cell.dateStr];
             const isTodayCell = cell.dateStr === INITIAL_TODAY_STR;
 
-            // Border styling matching Screenshot 3:
-            // - Done: Green outline (#2ECC71)
-            // - Missed: Coral Red outline (#E74C3C)
-            // - Unmarked: Light gray outline (#F0F1F5)
             let borderClass = 'border-[#F1F2F6]';
             if (status === 'done') {
               borderClass = cell.inCurrentMonth
@@ -1579,6 +2934,7 @@ function HabitHistoryDetailView({
 
             return (
               <button
+                type="button"
                 key={cell.dateStr}
                 onClick={() => onToggleCalendarDay(cell.dateStr)}
                 title={`${cell.dateStr}: Click to toggle Done / Missed / Clear`}
@@ -1606,13 +2962,10 @@ function HabitHistoryDetailView({
         </p>
       </div>
 
-      {/* Bottom Analytics Summary: Circular Ring Gauge + 4 Stat Pills */}
       <div className="mx-5 mt-5 grid grid-cols-12 gap-3 items-center">
-        {/* Left: Goal Met Circular Ring Gauge */}
         <div className="col-span-5 flex items-center justify-center">
           <div className="relative w-[156px] h-[156px] flex items-center justify-center">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 156 156">
-              {/* Track Ring */}
               <circle
                 cx="78"
                 cy="78"
@@ -1621,7 +2974,6 @@ function HabitHistoryDetailView({
                 stroke="#F0F1F6"
                 strokeWidth="12"
               />
-              {/* Progress Arc */}
               <circle
                 cx="78"
                 cy="78"
@@ -1644,62 +2996,49 @@ function HabitHistoryDetailView({
           </div>
         </div>
 
-        {/* Right: 4 Stacked Stat Pill Cards */}
         <div className="col-span-7 space-y-2.5">
-          {/* Current streak */}
           <div className="bg-white rounded-[14px] px-3.5 py-2.5 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
             <div className="flex items-center gap-2">
               <span className="w-5 h-5 rounded-md bg-[#F2EBFF] text-[#6236FF] flex items-center justify-center text-[11px] font-bold">
                 •••
               </span>
-              <span className="text-[13px] font-bold text-[#6E6B7B]">
-                Current streak
-              </span>
+              <span className="text-[13px] font-bold text-[#6E6B7B]">Current streak</span>
             </div>
             <span className="text-[13px] font-bold text-[#6236FF]">
               {stats.currentStreak} times
             </span>
           </div>
 
-          {/* Best streak */}
           <div className="bg-white rounded-[14px] px-3.5 py-2.5 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
             <div className="flex items-center gap-2">
               <span className="w-5 h-5 rounded-md bg-[#FFF4E5] text-[#F39C12] flex items-center justify-center">
-                <Flame className="w-3.5 h-3.5 fill-current" />
+                <FlameIcon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-[13px] font-bold text-[#6E6B7B]">
-                Best streak
-              </span>
+              <span className="text-[13px] font-bold text-[#6E6B7B]">Best streak</span>
             </div>
             <span className="text-[13px] font-bold text-[#F39C12]">
               {stats.bestStreak} times
             </span>
           </div>
 
-          {/* Done in month */}
           <div className="bg-white rounded-[14px] px-3.5 py-2.5 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
             <div className="flex items-center gap-2">
               <span className="w-5 h-5 rounded-md bg-[#EBF5FB] text-[#2E86DE] flex items-center justify-center">
                 <CalendarIcon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-[13px] font-bold text-[#6E6B7B]">
-                Done in month
-              </span>
+              <span className="text-[13px] font-bold text-[#6E6B7B]">Done in month</span>
             </div>
             <span className="text-[13px] font-bold text-[#2E86DE]">
               {stats.doneInMonth} days
             </span>
           </div>
 
-          {/* Total done */}
           <div className="bg-white rounded-[14px] px-3.5 py-2.5 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
             <div className="flex items-center gap-2">
               <span className="w-5 h-5 rounded-md bg-[#EAFAF1] text-[#2ECC71] flex items-center justify-center">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+                <CheckCircle2Icon className="w-3.5 h-3.5" />
               </span>
-              <span className="text-[13px] font-bold text-[#6E6B7B]">
-                Total done
-              </span>
+              <span className="text-[13px] font-bold text-[#6E6B7B]">Total done</span>
             </div>
             <span className="text-[13px] font-bold text-[#2ECC71]">
               {stats.totalDone} days
@@ -1736,7 +3075,7 @@ function HabitFormDialog({ mode, initialData, onClose, onSave }) {
   };
 
   return (
-    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-end sm:items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-end sm:items-center justify-center p-4 z-50">
       <form
         onSubmit={handleSubmit}
         className="bg-white w-full rounded-[28px] p-6 shadow-2xl space-y-5 max-h-[85vh] overflow-y-auto"
@@ -1750,11 +3089,10 @@ function HabitFormDialog({ mode, initialData, onClose, onSave }) {
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
           >
-            <X className="w-5 h-5" />
+            <XIcon className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Habit Name Input */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
             Habit Name
@@ -1773,7 +3111,6 @@ function HabitFormDialog({ mode, initialData, onClose, onSave }) {
           </div>
         </div>
 
-        {/* Emoji Picker Grid */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
             Choose Icon
@@ -1796,7 +3133,6 @@ function HabitFormDialog({ mode, initialData, onClose, onSave }) {
           </div>
         </div>
 
-        {/* Card Accent Color Theme */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
             Card Border & Check Theme
@@ -1827,7 +3163,6 @@ function HabitFormDialog({ mode, initialData, onClose, onSave }) {
           </div>
         </div>
 
-        {/* Weekly Frequency Target (1 - 7 days) */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-xs font-bold uppercase tracking-wider text-gray-400">
@@ -1855,7 +3190,6 @@ function HabitFormDialog({ mode, initialData, onClose, onSave }) {
           </div>
         </div>
 
-        {/* Submit & Cancel Buttons */}
         <div className="grid grid-cols-2 gap-3 pt-2">
           <button
             type="button"
