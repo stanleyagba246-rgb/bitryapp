@@ -89,7 +89,7 @@ jobs:
 
               defaultConfig {
                   applicationId "${PKG_ID}"
-                  minSdk 23
+                  minSdk 24
                   targetSdk 36
                   versionCode ${VER_CODE}
                   versionName "${VER_NAME}"
