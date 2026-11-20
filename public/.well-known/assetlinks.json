@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.bitry.app",
+      "sha256_cert_fingerprints": [
+        "B0:E4:0D:8F:E8:5B:C5:F3:05:AE:04:CA:B4:FD:69:76:4A:BA:F2:B1:49:D5:A3:86:C2:90:D3:CB:57:D2:00:68"
+      ]
+    }
+  }
+]
