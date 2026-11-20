@@ -1,0 +1,26 @@
+{
+"name": "Bitry — Daily Habit & Streak Tracker",
+"short_name": "Bitry",
+"description": "Daily habit tracker with visual streaks, monthly calendars, and weekly stats.",
+"start_url": "/",
+"scope": "/",
+"display": "standalone",
+"orientation": "portrait",
+"background_color": "#FAFBFD",
+"theme_color": "#5D38F6",
+"categories": ["productivity", "lifestyle", "health"],
+"icons": [
+{
+"src": "/bitry-icon-512.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any"
+},
+{
+"src": "/bitry-icon-512.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "maskable"
+}
+]
+}
