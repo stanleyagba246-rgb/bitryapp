@@ -1,0 +1,121 @@
+name: Build Signed Android AAB
+
+on:
+workflow_dispatch:
+inputs:
+package_id:
+description: 'Google Play Package ID (e.g., com.cozyautomations.bitry)'
+required: true
+default: 'com.cozyautomations.bitry'
+version_code:
+description: 'Android Version Code (increment for each upload)'
+required: true
+default: '1'
+version_name:
+description: 'App Version Name'
+required: true
+default: '1.0.0'
+
+jobs:
+build-aab:
+runs-on: ubuntu-latest
+
+steps:
+  - name: Checkout repository
+    uses: actions/checkout@v4
+
+  - name: Set up Node.js 22
+    uses: actions/setup-node@v4
+    with:
+      node-version: '22'
+
+  - name: Set up Java 21 (JDK)
+    uses: actions/setup-java@v4
+    with:
+      distribution: 'temurin'
+      java-version: '21'
+
+  - name: Install web dependencies and build Vite bundle
+    run: |
+      npm install
+      npm run build
+
+  - name: Install Capacitor 8 (Targets Android 16 / API 36)
+    run: |
+      npm install --no-save @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8 @capacitor/assets@4
+
+  - name: Configure Capacitor and add Android project
+    env:
+      PKG_ID: ${{ github.event.inputs.package_id }}
+      VER_CODE: ${{ github.event.inputs.version_code }}
+      VER_NAME: ${{ github.event.inputs.version_name }}
+    run: |
+      cat <<EOF > capacitor.config.json
+      {
+        "appId": "${PKG_ID}",
+        "appName": "Bitry",
+        "webDir": "dist"
+      }
+      EOF
+      npx cap add android
+      sed -i "s/versionCode 1/versionCode ${VER_CODE}/g" android/app/build.gradle
+      sed -i "s/versionName \"1.0\"/versionName \"${VER_NAME}\"/g" android/app/build.gradle
+      npx cap sync android
+
+  - name: Apply Bitry App Icon (if public/bitry-icon-512.png exists)
+    run: |
+      if [ -f "public/bitry-icon-512.png" ]; then
+        mkdir -p assets
+        cp public/bitry-icon-512.png assets/logo.png
+        npx @capacitor/assets generate --android \
+          --iconBackgroundColor '#5D38F6' \
+          --iconBackgroundColorDark '#5D38F6' \
+          --splashBackgroundColor '#FAFBFD' \
+          --splashBackgroundColorDark '#141422' || true
+      fi
+
+  - name: Build and sign Android App Bundle (.aab)
+    run: |
+      mkdir -p release-output
+      keytool -genkeypair -v \
+        -keystore release-output/bitry-upload-key.jks \
+        -alias bitry-key \
+        -keyalg RSA \
+        -keysize 2048 \
+        -validity 10000 \
+        -storepass bitry2026release \
+        -keypass bitry2026release \
+        -dname "CN=Cozy Automations LLC, OU=Mobile, O=Cozy Automations LLC, L=Albuquerque, ST=NM, C=US"
+
+      cd android
+      chmod +x gradlew
+      ./gradlew bundleRelease
+      cd ..
+
+      cp android/app/build/outputs/bundle/release/app-release.aab release-output/bitry-release.aab
+
+      jarsigner -verbose \
+        -sigalg SHA256withRSA \
+        -digestalg SHA-256 \
+        -keystore release-output/bitry-upload-key.jks \
+        -storepass bitry2026release \
+        -keypass bitry2026release \
+        release-output/bitry-release.aab \
+        bitry-key
+
+      cat <<EOF > release-output/SIGNING-INFO.txt
+      Bitry Android Release Signing Details
+      =====================================
+      Bundle File: bitry-release.aab
+      Keystore File: bitry-upload-key.jks
+      Key Alias: bitry-key
+      Keystore Password: bitry2026release
+      Key Password: bitry2026release
+      Keep bitry-upload-key.jks safe if you ever sign future updates manually.
+      EOF
+
+  - name: Upload signed .aab and keystore artifacts
+    uses: actions/upload-artifact@v4
+    with:
+      name: bitry-google-play-bundle
+      path: release-output/
