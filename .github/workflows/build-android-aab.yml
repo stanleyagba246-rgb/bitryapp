@@ -1,121 +1,239 @@
 name: Build Signed Android AAB
 
 on:
-workflow_dispatch:
-inputs:
-package_id:
-description: 'Google Play Package ID (e.g., com.cozyautomations.bitry)'
-required: true
-default: 'com.cozyautomations.bitry'
-version_code:
-description: 'Android Version Code (increment for each upload)'
-required: true
-default: '1'
-version_name:
-description: 'App Version Name'
-required: true
-default: '1.0.0'
+  workflow_dispatch:
+    inputs:
+      package_id:
+        description: Google Play Package ID
+        required: true
+        default: com.cozyautomations.bitry
+      version_code:
+        description: Android Version Code
+        required: true
+        default: '1'
+      version_name:
+        description: App Version Name
+        required: true
+        default: 1.0.0
 
 jobs:
-build-aab:
-runs-on: ubuntu-latest
+  build-aab:
+    runs-on: ubuntu-latest
 
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  - name: Set up Node.js 22
-    uses: actions/setup-node@v4
-    with:
-      node-version: '22'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-  - name: Set up Java 21 (JDK)
-    uses: actions/setup-java@v4
-    with:
-      distribution: 'temurin'
-      java-version: '21'
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-  - name: Install web dependencies and build Vite bundle
-    run: |
-      npm install
-      npm run build
+      - name: Install Android 36 SDK
+        run: |
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-  - name: Install Capacitor 8 (Targets Android 16 / API 36)
-    run: |
-      npm install --no-save @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8 @capacitor/assets@4
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
-  - name: Configure Capacitor and add Android project
-    env:
-      PKG_ID: ${{ github.event.inputs.package_id }}
-      VER_CODE: ${{ github.event.inputs.version_code }}
-      VER_NAME: ${{ github.event.inputs.version_name }}
-    run: |
-      cat <<EOF > capacitor.config.json
-      {
-        "appId": "${PKG_ID}",
-        "appName": "Bitry",
-        "webDir": "dist"
-      }
-      EOF
-      npx cap add android
-      sed -i "s/versionCode 1/versionCode ${VER_CODE}/g" android/app/build.gradle
-      sed -i "s/versionName \"1.0\"/versionName \"${VER_NAME}\"/g" android/app/build.gradle
-      npx cap sync android
+      - name: Create Android Project and Signing Key
+        env:
+          PKG_ID: ${{ github.event.inputs.package_id || 'com.cozyautomations.bitry' }}
+          VER_CODE: ${{ github.event.inputs.version_code || '1' }}
+          VER_NAME: ${{ github.event.inputs.version_name || '1.0.0' }}
+        run: |
+          mkdir -p android-twa/app/src/main/res/values
+          mkdir -p android-twa/app/src/main/res/mipmap-xxxhdpi
+          mkdir -p release-output
 
-  - name: Apply Bitry App Icon (if public/bitry-icon-512.png exists)
-    run: |
-      if [ -f "public/bitry-icon-512.png" ]; then
-        mkdir -p assets
-        cp public/bitry-icon-512.png assets/logo.png
-        npx @capacitor/assets generate --android \
-          --iconBackgroundColor '#5D38F6' \
-          --iconBackgroundColorDark '#5D38F6' \
-          --splashBackgroundColor '#FAFBFD' \
-          --splashBackgroundColorDark '#141422' || true
-      fi
+          cat << 'EOF' > android-twa/settings.gradle
+          rootProject.name = "Bitry"
+          include(":app")
+          EOF
 
-  - name: Build and sign Android App Bundle (.aab)
-    run: |
-      mkdir -p release-output
-      keytool -genkeypair -v \
-        -keystore release-output/bitry-upload-key.jks \
-        -alias bitry-key \
-        -keyalg RSA \
-        -keysize 2048 \
-        -validity 10000 \
-        -storepass bitry2026release \
-        -keypass bitry2026release \
-        -dname "CN=Cozy Automations LLC, OU=Mobile, O=Cozy Automations LLC, L=Albuquerque, ST=NM, C=US"
+          cat << 'EOF' > android-twa/gradle.properties
+          android.useAndroidX=true
+          org.gradle.jvmargs=-Xmx2048m
+          EOF
 
-      cd android
-      chmod +x gradlew
-      ./gradlew bundleRelease
-      cd ..
+          cat << 'EOF' > android-twa/build.gradle
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath "com.android.tools.build:gradle:8.7.2"
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
 
-      cp android/app/build/outputs/bundle/release/app-release.aab release-output/bitry-release.aab
+          cat << EOF > android-twa/app/build.gradle
+          apply plugin: "com.android.application"
 
-      jarsigner -verbose \
-        -sigalg SHA256withRSA \
-        -digestalg SHA-256 \
-        -keystore release-output/bitry-upload-key.jks \
-        -storepass bitry2026release \
-        -keypass bitry2026release \
-        release-output/bitry-release.aab \
-        bitry-key
+          android {
+              namespace "${PKG_ID}"
+              compileSdk 36
 
-      cat <<EOF > release-output/SIGNING-INFO.txt
-      Bitry Android Release Signing Details
-      =====================================
-      Bundle File: bitry-release.aab
-      Keystore File: bitry-upload-key.jks
-      Key Alias: bitry-key
-      Keystore Password: bitry2026release
-      Key Password: bitry2026release
-      Keep bitry-upload-key.jks safe if you ever sign future updates manually.
-      EOF
+              defaultConfig {
+                  applicationId "${PKG_ID}"
+                  minSdk 23
+                  targetSdk 36
+                  versionCode ${VER_CODE}
+                  versionName "${VER_NAME}"
+              }
 
-  - name: Upload signed .aab and keystore artifacts
-    uses: actions/upload-artifact@v4
-    with:
-      name: bitry-google-play-bundle
-      path: release-output/
+              signingConfigs {
+                  release {
+                      storeFile file("../bitry-upload-key.jks")
+                      storePassword "bitry2026release"
+                      keyAlias "bitry-key"
+                      keyPassword "bitry2026release"
+                  }
+              }
+
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                      signingConfig signingConfigs.release
+                  }
+              }
+
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+          }
+
+          dependencies {
+              implementation "com.google.androidbrowserhelper:androidbrowserhelper:2.5.0"
+          }
+          EOF
+
+          cat << 'EOF' > android-twa/app/src/main/res/values/strings.xml
+          <resources>
+              <string name="app_name">Bitry</string>
+              <string name="asset_statements">[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "web", "site": "https://bitryapp.vercel.app"}}]</string>
+          </resources>
+          EOF
+
+          cat << 'EOF' > android-twa/app/src/main/res/values/colors.xml
+          <resources>
+              <color name="colorPrimary">#5D38F6</color>
+          </resources>
+          EOF
+
+          cat << 'EOF' > android-twa/app/src/main/AndroidManifest.xml
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <application
+                  android:allowBackup="true"
+                  android:icon="@mipmap/ic_launcher"
+                  android:label="@string/app_name"
+                  android:supportsRtl="true"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar">
+                  <meta-data
+                      android:name="asset_statements"
+                      android:resource="@string/asset_statements" />
+                  <activity
+                      android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
+                      android:exported="true"
+                      android:label="@string/app_name">
+                      <meta-data
+                          android:name="android.support.customtabs.trusted.DEFAULT_URL"
+                          android:value="https://bitryapp.vercel.app" />
+                      <meta-data
+                          android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+                          android:resource="@color/colorPrimary" />
+                      <meta-data
+                          android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+                          android:resource="@color/colorPrimary" />
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                      <intent-filter android:autoVerify="true">
+                          <action android:name="android.intent.action.VIEW" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                          <category android:name="android.intent.category.BROWSABLE" />
+                          <data
+                              android:scheme="https"
+                              android:host="bitryapp.vercel.app" />
+                      </intent-filter>
+                  </activity>
+                  <activity
+                      android:name="com.google.androidbrowserhelper.trusted.FocusActivity"
+                      android:exported="false" />
+                  <service
+                      android:name="com.google.androidbrowserhelper.trusted.DelegationService"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE" />
+                          <category android:name="android.intent.category.DEFAULT" />
+                      </intent-filter>
+                  </service>
+              </application>
+          </manifest>
+          EOF
+
+          if [ -f "public/bitry-icon-512.png" ]; then
+            cp public/bitry-icon-512.png android-twa/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          else
+            python3 -c 'import struct, zlib; w=h=512; raw=b"".join(b"\x00"+b"\x5d\x38\xf6\xff"*w for _ in range(h)); c=lambda t,d: struct.pack(">I",len(d))+t+d+struct.pack(">I",zlib.crc32(t+d)&0xffffffff); open("android-twa/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png","wb").write(b"\x89PNG\r\n\x1a\n"+c(b"IHDR",struct.pack(">IIBBBBB",w,h,8,6,0,0,0))+c(b"IDAT",zlib.compress(raw))+c(b"IEND",b""))'
+          fi
+
+          keytool -genkeypair -v \
+            -keystore android-twa/bitry-upload-key.jks \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -alias bitry-key \
+            -storepass bitry2026release \
+            -keypass bitry2026release \
+            -dname "CN=Cozy Automations LLC, O=Cozy Automations LLC, L=Albuquerque, ST=NM, C=US"
+
+          cp android-twa/bitry-upload-key.jks release-output/bitry-upload-key.jks
+          SHA256=$(keytool -list -v -keystore release-output/bitry-upload-key.jks -storepass bitry2026release -alias bitry-key | grep "SHA256:" | sed 's/.*SHA256: //')
+
+          cat << EOF > release-output/SIGNING-INFO.txt
+          Bitry Android Signing Key
+          Keystore: bitry-upload-key.jks
+          Password: bitry2026release
+          Alias: bitry-key
+          SHA-256: ${SHA256}
+          EOF
+
+          cat << EOF > release-output/assetlinks.json
+          [{
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+              "namespace": "android_app",
+              "package_name": "${PKG_ID}",
+              "sha256_cert_fingerprints": ["${SHA256}"]
+            }
+          }]
+          EOF
+
+      - name: Build Signed Android App Bundle
+        working-directory: android-twa
+        run: gradle bundleRelease
+
+      - name: Copy AAB to Release Folder
+        run: cp android-twa/app/build/outputs/bundle/release/app-release.aab release-output/bitry-release.aab
+
+      - name: Upload bitry-google-play-bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bitry-google-play-bundle
+          path: release-output/
